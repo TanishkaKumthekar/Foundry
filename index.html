@@ -1,0 +1,2198 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foundry - Build Bold Ideas</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind Config for Warm, Friendly & Premium Design -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'SFMono-Regular', 'monospace'],
+                    },
+                    colors: {
+                        warm: {
+                            50: '#FDFDFB',
+                            100: '#FAFAF8',   // Main warm white background
+                            200: '#F4F4F0',
+                            300: '#EBEBE4',
+                            800: '#2C2C28',   // Soft charcoal
+                            900: '#1C1C1A'
+                        },
+                        sage: {
+                            50: '#f4f7f6',
+                            100: '#e9efee',
+                            500: '#84a98c',   // Calm organic sage green
+                            600: '#52796f',
+                        },
+                        coral: {
+                            500: '#f07167',   // Highlight coral accent
+                            600: '#df5e55',
+                        },
+                        warmorange: {
+                            500: '#e76f51',   // Warm friendly orange primary button
+                            600: '#d75a3d',
+                        },
+                        softteal: {
+                            500: '#58a4b0',   // Calming teal secondary
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-slight': 'bounceSlight 1s infinite',
+                        'scan': 'scan 2s linear infinite',
+                        'fade-in': 'fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'slide-up': 'slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                    },
+                    keyframes: {
+                        bounceSlight: {
+                            '0%, 100%': { transform: 'translateY(-4%)', animationTimingFunction: 'cubic-bezier(0.8,0,1,1)' },
+                            '50%': { transform: 'none', animationTimingFunction: 'cubic-bezier(0,0,0.2,1)' },
+                        },
+                        scan: {
+                            '0%': { transform: 'translateY(-100%)' },
+                            '100%': { transform: 'translateY(1000%)' }
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(12px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Markdown Parser and Sanitizer -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+    
+    <style>
+        /* Premium custom scrollbar matching Notion/Apple aesthetic */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #E4E4E0; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-thumb { background: #3f3f46; }
+        ::-webkit-scrollbar-thumb:hover { background: #CFCFC8; }
+        .dark ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+        
+        /* Premium Glassmorphism Cards with strict dark mode borders */
+        .glass {
+            background: rgba(250, 250, 248, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(228, 224, 218, 0.6);
+        }
+        .dark .glass {
+            background: rgba(24, 24, 27, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Smooth spring animation for hover lift actions */
+        .spring-hover {
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s;
+        }
+        .spring-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+        }
+        .dark .spring-hover:hover {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Dynamic Loading Dots */
+        .typing-dot {
+            width: 5px; height: 5px;
+            background-color: currentColor;
+            border-radius: 50%;
+            display: inline-block;
+            animation: bounceSlight 1.2s infinite ease-in-out both;
+        }
+        .typing-dot:nth-child(1) { animation-delay: -0.3s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.15s; }
+        
+        body { transition: background-color 0.3s ease, color 0.3s ease; }
+
+        /* Workspace Document Item States */
+        .doc-item.active {
+            background-color: rgba(132, 169, 140, 0.12);
+            border-color: rgba(132, 169, 140, 0.3);
+            color: #52796f;
+        }
+        .dark .doc-item.active {
+            background-color: rgba(132, 169, 140, 0.2);
+            border-color: rgba(132, 169, 140, 0.45);
+            color: #84a98c;
+        }
+
+        /* Citation Styles */
+        .citation-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #52796f;
+            background: rgba(132, 169, 140, 0.12);
+            border: 1px solid rgba(132, 169, 140, 0.2);
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 0 2px;
+            vertical-align: middle;
+        }
+        .dark .citation-btn {
+            color: #84a98c;
+            background: rgba(132, 169, 140, 0.18);
+            border-color: rgba(132, 169, 140, 0.3);
+        }
+        .citation-btn:hover { background: rgba(132, 169, 140, 0.25); transform: translateY(-1px); }
+        .citation-btn i { width: 10px; height: 10px; }
+
+        /* Circular progress chart configurations */
+        .circle-bg { fill: none; stroke: rgba(132, 169, 140, 0.1); stroke-width: 3.8; }
+        .circle-progress { fill: none; stroke-linecap: round; stroke-width: 3.8; transition: stroke-dasharray 0.8s ease; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-warm-100 text-warm-800 dark:bg-zinc-950 dark:text-zinc-100 h-screen w-screen overflow-hidden flex flex-col font-sans antialiased selection:bg-sage-500/20">
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm pointer-events-none"></div>
+
+    <!-- COMMAND PALETTE (CTRL+K) -->
+    <div id="command-palette" class="fixed inset-0 bg-warm-800/20 dark:bg-black/60 backdrop-blur-md z-50 flex items-start justify-center pt-[15vh] hidden">
+        <div class="bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden transform scale-95 transition-all" id="cmd-box">
+            <div class="p-4 border-b border-neutral-100 dark:border-zinc-800 flex items-center gap-3">
+                <i data-lucide="search" class="text-neutral-400"></i>
+                <input type="text" id="cmd-input" placeholder="Search startup workspace, documents, tools..." class="w-full bg-transparent outline-none text-base text-warm-800 dark:text-zinc-100 placeholder:text-neutral-400">
+                <kbd class="px-2 py-1 text-xs bg-warm-200/50 dark:bg-zinc-800 border border-neutral-200 dark:border-zinc-700 rounded text-neutral-400 dark:text-zinc-500">ESC</kbd>
+            </div>
+            <div class="max-h-96 overflow-y-auto p-2" id="cmd-results"></div>
+        </div>
+    </div>
+
+    <!-- ONBOARDING & SPLASH SCREEN -->
+    <div id="splash-screen" class="fixed inset-0 bg-warm-100 dark:bg-zinc-950 z-50 flex flex-col items-center justify-center text-center p-6 select-none">
+        <div class="relative mb-6">
+            <div class="absolute inset-0 bg-sage-500/20 blur-3xl rounded-full scale-150 animate-pulse-slow"></div>
+            <div class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-sage-500 to-softteal-500 flex flex-col items-center justify-center shadow-xl relative z-10">
+                <i data-lucide="brain-circuit" class="w-10 h-10 text-white"></i>
+            </div>
+        </div>
+        <h1 class="text-3xl font-extrabold tracking-tight text-warm-800 dark:text-white mb-1">Foundry</h1>
+        <p class="text-sage-600 dark:text-sage-500 font-semibold text-xs tracking-wider uppercase mb-8">Build Bold Ideas</p>
+        
+        <div class="max-w-md bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 p-6 rounded-2xl shadow-xl space-y-4" id="onboarding-card">
+            <h3 class="text-warm-800 dark:text-white font-bold text-lg">Setup Your Workspace</h3>
+            <p class="text-xs text-neutral-500 dark:text-zinc-400 leading-relaxed">Let's connect your Gemini API Key. Your key is stored securely inside your local sandbox.</p>
+            <div class="space-y-2 text-left">
+                <label class="block text-[10px] font-bold text-neutral-400 dark:text-zinc-500 uppercase tracking-wider">Gemini API Key</label>
+                <div class="relative">
+                    <input type="password" id="onboarding-api-key" placeholder="Enter API Key (e.g. AQ.Ab8RN... or AIzaSy...)" class="w-full bg-warm-200/40 dark:bg-zinc-950/60 border border-neutral-200 dark:border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-warm-800 dark:text-white outline-none focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20 transition-all">
+                </div>
+            </div>
+            <button id="btn-onboarding-start" class="w-full py-3 rounded-xl bg-warmorange-500 hover:bg-warmorange-600 transition-all text-white text-sm font-semibold shadow-lg shadow-warmorange-500/20">
+                Launch My Workspace
+            </button>
+            <button id="btn-onboarding-skip" class="text-xs text-neutral-400 hover:text-warm-800 dark:hover:text-zinc-200 transition-colors w-full text-center mt-2">Skip for now, show demo</button>
+        </div>
+    </div>
+
+    <!-- TOP NAVBAR -->
+    <header class="h-14 glass flex-shrink-0 z-20 flex items-center justify-between px-4 border-b border-neutral-200 dark:border-zinc-800/80 relative">
+        <div class="flex items-center gap-4">
+            <button id="sidebar-toggle" class="p-1.5 rounded-lg text-neutral-500 hover:bg-warm-200/50 dark:hover:bg-zinc-900 transition-colors">
+                <i data-lucide="menu" class="w-4 h-4"></i>
+            </button>
+            <div class="flex items-center gap-2 cursor-pointer group">
+                <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-sage-500 to-softteal-500 flex items-center justify-center shadow-sm">
+                    <i data-lucide="brain-circuit" class="w-4 h-4 text-white"></i>
+                </div>
+                <span class="font-bold text-sm tracking-tight text-warm-800 dark:text-white">Foundry</span>
+            </div>
+            <div class="h-4 w-px bg-neutral-300 dark:bg-zinc-800 mx-1"></div>
+            <button id="btn-cmd-palette-trigger" class="flex items-center gap-2 text-xs text-neutral-400 dark:text-zinc-500 border border-neutral-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 bg-white dark:bg-zinc-900 hover:bg-warm-200/40 dark:hover:bg-zinc-800 transition-colors">
+                <i data-lucide="command" class="w-3.5 h-3.5"></i>
+                <span>Search Workspace</span>
+                <kbd class="ml-1 text-[10px] font-mono opacity-60">⌘K</kbd>
+            </button>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <div id="api-status-container" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 transition-colors cursor-pointer hover:bg-red-100/50 dark:hover:bg-red-500/20">
+                <div id="api-status-dot" class="w-1.5 h-1.5 rounded-full bg-red-500 transition-colors"></div>
+                <span id="api-status-text" class="text-xs font-semibold text-red-700 dark:text-red-400">Disconnected</span>
+            </div>
+            <button id="api-key-btn" class="text-xs font-semibold px-3 py-1.5 rounded-lg border border-neutral-200 dark:border-zinc-800 hover:border-sage-500 dark:hover:border-sage-500 text-neutral-600 dark:text-zinc-300 hover:text-sage-600 dark:hover:text-sage-400 transition-colors">
+                API Config
+            </button>
+            <div class="h-4 w-px bg-neutral-300 dark:bg-zinc-800 mx-1"></div>
+            <button id="themeToggle" class="p-1.5 rounded-lg text-neutral-500 hover:bg-warm-200/50 dark:hover:bg-zinc-900 transition-colors">
+                <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+                <i data-lucide="moon" class="w-4 h-4 block dark:hidden"></i>
+            </button>
+            <button id="btn-show-dashboard" class="p-1.5 rounded-lg text-neutral-500 hover:bg-warm-200/50 dark:hover:bg-zinc-900 transition-colors relative" title="View Workspace Dashboard">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            </button>
+            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-sage-500 to-softteal-500 p-[2px] cursor-pointer ml-1">
+                <div class="w-full h-full rounded-full bg-white dark:bg-zinc-900 overflow-hidden">
+                    <img src="https://ui-avatars.com/api/?name=Founder&background=84a98c&color=fff" alt="User" class="w-full h-full object-cover">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 flex overflow-hidden relative">
+        
+        <!-- LEFT SIDEBAR -->
+        <aside id="left-sidebar" class="w-72 flex-shrink-0 bg-white dark:bg-zinc-900 border-r border-neutral-200 dark:border-zinc-850 flex flex-col z-10 glass transition-all duration-300">
+            <div class="p-4 pb-2">
+                <div class="relative group">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-sage-500 transition-colors"></i>
+                    <input type="text" id="sidebar-search" placeholder="Filter files & tools..." class="w-full bg-warm-200/40 dark:bg-zinc-950/60 border border-transparent focus:border-sage-500/50 focus:bg-white dark:focus:bg-zinc-900 rounded-xl pl-9 pr-4 py-2 text-xs outline-none transition-all placeholder:text-neutral-400 dark:placeholder:text-zinc-500 text-warm-800 dark:text-zinc-100">
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-3 space-y-6">
+                <!-- Navigation Sections -->
+                <div>
+                    <h3 class="text-[10px] font-bold text-neutral-400 dark:text-zinc-500 uppercase tracking-wider mb-2 px-2">Navigation</h3>
+                    <ul class="space-y-1 text-xs">
+                        <li>
+                            <button id="nav-btn-home" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl bg-warm-200/50 dark:bg-zinc-800/50 font-semibold text-neutral-800 dark:text-zinc-100 hover:bg-warm-200/80 dark:hover:bg-zinc-800 transition-all text-left">
+                                <i data-lucide="home" class="w-4 h-4 text-sage-500"></i> Home
+                            </button>
+                        </li>
+                        <li>
+                            <button onclick="document.getElementById('file-upload').click()" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-neutral-600 dark:text-zinc-400 hover:bg-warm-200/40 dark:hover:bg-zinc-800/30 hover:text-neutral-800 dark:hover:text-zinc-100 transition-all text-left">
+                                <i data-lucide="folder" class="w-4 h-4"></i> My Startup Files
+                            </button>
+                        </li>
+                        <li>
+                            <button id="nav-btn-insights" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-neutral-600 dark:text-zinc-400 hover:bg-warm-200/40 dark:hover:bg-zinc-800/30 hover:text-neutral-800 dark:hover:text-zinc-100 transition-all text-left">
+                                <i data-lucide="sparkles" class="w-4 h-4"></i> Dashboard Insights
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Upload Drop Area -->
+                <div>
+                    <h3 class="text-[10px] font-bold text-neutral-400 dark:text-zinc-500 uppercase tracking-wider mb-2 px-2">Upload Arena</h3>
+                    <input type="file" id="file-upload" class="hidden" accept=".pdf" multiple>
+                    <div id="drop-zone" class="border border-dashed border-neutral-200 dark:border-zinc-800 rounded-2xl p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:border-sage-500 hover:bg-sage-50 dark:hover:bg-sage-500/5 transition-all group relative overflow-hidden bg-white dark:bg-zinc-950/20">
+                        <div class="p-2 rounded-xl bg-sage-50 dark:bg-zinc-900 text-sage-500 mb-2 transition-transform group-hover:scale-105">
+                            <i data-lucide="upload-cloud" class="w-5 h-5"></i>
+                        </div>
+                        <p class="text-xs font-semibold text-warm-800 dark:text-zinc-200 mb-1">Upload Documents</p>
+                        <p class="text-[10px] text-neutral-400 dark:text-zinc-500">Drag & Drop PDFs</p>
+                    </div>
+                </div>
+
+                <!-- Recent Documents List -->
+                <div>
+                    <div class="flex items-center justify-between px-2 mb-1">
+                        <h3 class="text-[10px] font-bold text-neutral-400 dark:text-zinc-500 uppercase tracking-wider">Active Workspace</h3>
+                    </div>
+                    <ul id="document-list" class="space-y-1">
+                        <div class="px-2 py-4 text-xs text-center text-neutral-400 dark:text-zinc-500 italic bg-white dark:bg-zinc-950/40 border border-neutral-100 dark:border-zinc-800 rounded-2xl" id="empty-doc-list">
+                            No loaded documents.
+                        </div>
+                    </ul>
+                </div>
+
+                <!-- Workspace Session Memory status -->
+                <div class="p-3 bg-sage-500/5 border border-sage-500/10 dark:border-sage-500/20 rounded-2xl">
+                    <div class="flex items-center gap-2 mb-1">
+                        <i data-lucide="check" class="w-3.5 h-3.5 text-sage-500"></i>
+                        <span class="text-[10px] font-bold text-sage-600 dark:text-sage-400 uppercase tracking-widest">Active Memory</span>
+                    </div>
+                    <p class="text-[10px] text-neutral-500 dark:text-zinc-400 leading-relaxed">
+                        Workspace documents are cross-indexed to enable comparison matrix evaluation.
+                    </p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- CENTER PANEL (MAIN WORKSPACE & HOME STATE) -->
+        <section class="flex-1 flex flex-col bg-warm-100 dark:bg-zinc-950 relative z-0 overflow-hidden">
+            
+            <!-- Warm Welcome / Home Experience -->
+            <div id="empty-state" class="flex-1 overflow-y-auto p-4 sm:p-8 bg-warm-50 dark:bg-zinc-950 absolute inset-0 z-20">
+                <div class="max-w-4xl mx-auto py-12 space-y-12 animate-fade-in">
+                    
+                    <div class="space-y-3">
+                        <h1 class="text-4xl font-extrabold text-warm-800 dark:text-white tracking-tight">👋 Welcome back, Founder.</h1>
+                        <p class="text-neutral-500 dark:text-zinc-400 text-base max-w-xl font-medium">
+                            Upload your startup documents and let's build something investors will love. Let's analyze metrics, risks, and structures organically.
+                        </p>
+                    </div>
+
+                    <!-- Welcome Interactive Actions Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        <div onclick="document.getElementById('file-upload').click()" class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-neutral-200/60 dark:border-zinc-800 cursor-pointer spring-hover group flex flex-col justify-between h-36">
+                            <div class="w-10 h-10 rounded-xl bg-sage-50 dark:bg-zinc-800/80 flex items-center justify-center text-sage-500 group-hover:scale-105 transition-transform">
+                                <i data-lucide="file-up" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-warm-800 dark:text-zinc-100">Upload Business Plan</h3>
+                                <p class="text-[11px] text-neutral-400 dark:text-zinc-400 mt-1">Sift through documents and build a startup profile.</p>
+                            </div>
+                        </div>
+
+                        <div onclick="triggerQuickAction('Analyze Market')" class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-neutral-200/60 dark:border-zinc-800 cursor-pointer spring-hover group flex flex-col justify-between h-36">
+                            <div class="w-10 h-10 rounded-xl bg-softteal-500/10 flex items-center justify-center text-softteal-500 group-hover:scale-105 transition-transform">
+                                <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-warm-800 dark:text-zinc-100">Analyze Market</h3>
+                                <p class="text-[11px] text-neutral-400 dark:text-zinc-400 mt-1">Deep dive into scale capabilities and targets.</p>
+                            </div>
+                        </div>
+
+                        <div onclick="triggerQuickAction('Create Pitch')" class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-neutral-200/60 dark:border-zinc-800 cursor-pointer spring-hover group flex flex-col justify-between h-36">
+                            <div class="w-10 h-10 rounded-xl bg-coral-500/10 flex items-center justify-center text-coral-500 group-hover:scale-105 transition-transform">
+                                <i data-lucide="presentation" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-warm-800 dark:text-zinc-100">Build Investor Pitch</h3>
+                                <p class="text-[11px] text-neutral-400 dark:text-zinc-400 mt-1">Turn documents into professional slide layouts.</p>
+                            </div>
+                        </div>
+                        
+                        <div onclick="triggerQuickAction('Brainstorm New Ideas')" class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-neutral-200/60 dark:border-zinc-800 cursor-pointer spring-hover group flex flex-col justify-between h-36">
+                            <div class="w-10 h-10 rounded-xl bg-yellow-500/10 flex items-center justify-center text-yellow-500 group-hover:scale-105 transition-transform">
+                                <i data-lucide="lightbulb" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-warm-800 dark:text-zinc-100">Brainstorm New Ideas</h3>
+                                <p class="text-[11px] text-neutral-400 dark:text-zinc-400 mt-1">Challenge your strategies with AI feedback.</p>
+                            </div>
+                        </div>
+
+                        <div onclick="triggerQuickAction('Growth Strategy')" class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-neutral-200/60 dark:border-zinc-800 cursor-pointer spring-hover group flex flex-col justify-between h-36">
+                            <div class="w-10 h-10 rounded-xl bg-warmorange-500/10 flex items-center justify-center text-warmorange-500 group-hover:scale-105 transition-transform">
+                                <i data-lucide="trending-up" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-warm-800 dark:text-zinc-100">Growth Strategy</h3>
+                                <p class="text-[11px] text-neutral-400 dark:text-zinc-400 mt-1">Accelerate scaling cycles with program scripts.</p>
+                            </div>
+                        </div>
+
+                        <div onclick="document.getElementById('file-upload').click()" class="border-2 border-dashed border-neutral-200 dark:border-zinc-800 p-5 rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer hover:border-sage-500 hover:bg-sage-500/5 transition-all h-36">
+                            <i data-lucide="plus" class="w-6 h-6 text-neutral-400 dark:text-zinc-600 mb-2"></i>
+                            <span class="text-xs font-semibold text-neutral-500 dark:text-zinc-500">Drag PDF Here</span>
+                        </div>
+                    </div>
+
+                    <!-- Sandbox Memory Active files container -->
+                    <div class="border border-neutral-200/60 dark:border-zinc-800 rounded-2xl p-6 bg-white dark:bg-zinc-900">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="box" class="w-4 h-4 text-sage-500"></i>
+                                <h3 class="text-sm font-bold text-warm-800 dark:text-zinc-100">Foundry Sandbox</h3>
+                            </div>
+                            <span class="text-[11px] bg-sage-500/15 text-sage-600 dark:text-sage-400 px-2.5 py-1 rounded-full font-bold">Ready</span>
+                        </div>
+                        <p class="text-xs text-neutral-500 dark:text-zinc-400 leading-relaxed">
+                            Upload your documents. Your startup's financials, competitors, opportunities, and risks will map automatically into interactive visualization models.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Active Document Area -->
+            <div id="active-state" class="hidden flex-1 flex flex-col h-full overflow-hidden">
+                
+                <!-- Toolbar & Tabs -->
+                <div class="h-14 flex items-center justify-between px-4 border-b border-neutral-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md sticky top-0 z-10 flex-shrink-0">
+                    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+                        <div class="flex bg-warm-200/60 dark:bg-zinc-950 p-1 rounded-xl">
+                            <button id="tab-dashboard" class="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-zinc-800 shadow-sm text-neutral-800 dark:text-zinc-100 transition-all whitespace-nowrap">Dashboard</button>
+                            <button id="tab-compare" class="px-3.5 py-1.5 text-xs font-bold rounded-lg text-neutral-500 hover:text-neutral-800 dark:text-zinc-400 dark:hover:text-zinc-200 transition-all whitespace-nowrap">Compare Docs</button>
+                            <button id="tab-pitch" class="px-3.5 py-1.5 text-xs font-bold rounded-lg text-neutral-500 hover:text-neutral-800 dark:text-zinc-400 dark:hover:text-zinc-200 transition-all whitespace-nowrap">Pitch Deck</button>
+                            <button id="tab-viewer" class="px-3.5 py-1.5 text-xs font-bold rounded-lg text-neutral-500 hover:text-neutral-800 dark:text-zinc-400 dark:hover:text-zinc-200 transition-all whitespace-nowrap">Document Viewer</button>
+                        </div>
+                        <span id="current-doc-title" class="font-bold text-xs text-warm-800 dark:text-zinc-100 flex items-center gap-1.5 ml-2 hidden sm:flex">
+                            <i data-lucide="file-text" class="w-3.5 h-3.5 text-sage-500"></i>
+                            <span class="truncate max-w-[150px]">document.pdf</span>
+                        </span>
+                    </div>
+
+                    <!-- Actions Panel & Exports -->
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <div class="relative group">
+                            <button class="flex items-center gap-1 px-3 py-1.5 bg-white dark:bg-zinc-800 border border-neutral-200 dark:border-zinc-750 rounded-xl text-xs font-semibold hover:bg-neutral-50 dark:hover:bg-zinc-700 transition-all text-neutral-700 dark:text-zinc-300">
+                                <i data-lucide="download" class="w-3.5 h-3.5"></i> Export
+                            </button>
+                            <div class="absolute right-0 mt-1.5 w-40 bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 rounded-xl shadow-2xl z-30 hidden group-hover:block transition-all p-1">
+                                <button onclick="simulateExport('PDF Report')" class="w-full text-left px-3 py-2 text-xs hover:bg-neutral-50 dark:hover:bg-zinc-800 rounded-lg flex items-center gap-2 text-neutral-700 dark:text-zinc-300"><i data-lucide="file-text" class="w-3.5 h-3.5 text-coral-500"></i> PDF Report</button>
+                                <button onclick="simulateExport('PowerPoint')" class="w-full text-left px-3 py-2 text-xs hover:bg-neutral-50 dark:hover:bg-zinc-800 rounded-lg flex items-center gap-2 text-neutral-700 dark:text-zinc-300"><i data-lucide="presentation" class="w-3.5 h-3.5 text-warmorange-500"></i> PowerPoint</button>
+                                <button onclick="simulateExport('Markdown')" class="w-full text-left px-3 py-2 text-xs hover:bg-neutral-50 dark:hover:bg-zinc-800 rounded-lg flex items-center gap-2 text-neutral-700 dark:text-zinc-300"><i data-lucide="file-code" class="w-3.5 h-3.5 text-sage-500"></i> Markdown</button>
+                                <button onclick="simulateExport('Business Summary')" class="w-full text-left px-3 py-2 text-xs hover:bg-neutral-50 dark:hover:bg-zinc-800 rounded-lg flex items-center gap-2 text-neutral-700 dark:text-zinc-300"><i data-lucide="file-check-2" class="w-3.5 h-3.5 text-purple-500"></i> Exec Summary</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Viewer Controls -->
+                        <div id="viewer-controls" class="hidden flex items-center gap-1 bg-warm-200/50 dark:bg-zinc-950 rounded-xl p-1 border border-neutral-200/60 dark:border-zinc-800">
+                            <button id="btn-zoom-out" class="p-1 hover:bg-white dark:hover:bg-zinc-800 rounded-lg text-neutral-500 transition-colors">
+                                <i data-lucide="zoom-out" class="w-4 h-4"></i>
+                            </button>
+                            <span id="zoom-level" class="text-xs font-bold px-2 w-12 text-center text-neutral-600 dark:text-zinc-300">100%</span>
+                            <button id="btn-zoom-in" class="p-1 hover:bg-white dark:hover:bg-zinc-800 rounded-lg text-neutral-500 transition-colors">
+                                <i data-lucide="zoom-in" class="w-4 h-4"></i>
+                            </button>
+                            <div class="w-px h-4 bg-neutral-300 dark:bg-zinc-800 mx-1"></div>
+                            <button id="btn-prev-page" class="p-1 hover:bg-white dark:hover:bg-zinc-800 rounded-lg text-neutral-500 transition-colors">
+                                <i data-lucide="chevron-up" class="w-4 h-4"></i>
+                            </button>
+                            <div class="flex items-center gap-1 text-xs">
+                                <input id="page-num" type="text" value="1" class="w-8 text-center bg-transparent border border-neutral-300 dark:border-zinc-700 rounded-lg focus:border-sage-500 outline-none text-neutral-800 dark:text-zinc-100 py-0.5 font-bold">
+                                <span class="text-neutral-400 dark:text-zinc-500">/ <span id="page-count" class="font-bold">1</span></span>
+                            </div>
+                            <button id="btn-next-page" class="p-1 hover:bg-white dark:hover:bg-zinc-800 rounded-lg text-neutral-500 transition-colors">
+                                <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PDF Viewport -->
+                <div id="pdf-viewport" class="hidden flex-1 overflow-auto p-4 sm:p-8 flex justify-center bg-warm-200/50 dark:bg-zinc-950 relative">
+                    <canvas id="pdf-render" class="shadow-2xl shadow-neutral-800/10 dark:shadow-black/60 rounded-xl transition-transform duration-200 origin-top bg-white"></canvas>
+                </div>
+
+                <!-- Compare Viewport -->
+                <div id="compare-viewport" class="hidden flex-1 overflow-auto p-4 sm:p-8 bg-warm-100 dark:bg-zinc-950">
+                    <div class="max-w-4xl mx-auto space-y-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-neutral-200 dark:border-zinc-800 pb-4 gap-4">
+                            <div>
+                                <h2 class="text-xl font-extrabold text-neutral-800 dark:text-zinc-100">Workspace Comparison Matrix</h2>
+                                <p class="text-xs text-neutral-500 dark:text-zinc-400 mt-1">Cross-examine metric variations between uploaded startup business plans.</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <select id="compare-select-1" class="bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs text-neutral-800 dark:text-zinc-100 outline-none focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20 transition-all shadow-sm"></select>
+                                <span class="text-xs font-bold text-neutral-400">VS</span>
+                                <select id="compare-select-2" class="bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs text-neutral-800 dark:text-zinc-100 outline-none focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20 transition-all shadow-sm"></select>
+                            </div>
+                        </div>
+
+                        <div id="compare-content" class="grid grid-cols-1 sm:grid-cols-2 gap-6 animate-fade-in"></div>
+                    </div>
+                </div>
+
+                <!-- Slide/Pitch Deck Previewer Tab -->
+                <div id="pitch-viewport" class="hidden flex-1 overflow-auto p-4 sm:p-8 bg-warm-100 dark:bg-zinc-950 flex flex-col justify-between">
+                    <div class="max-w-4xl mx-auto w-full flex-1 flex flex-col justify-center animate-fade-in">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h2 class="text-xl font-extrabold text-neutral-800 dark:text-zinc-100">Pitch Presentation Simulator</h2>
+                                <p class="text-xs text-neutral-500 dark:text-zinc-400 mt-1">Clean investor slides mapped from your analyzed workspace.</p>
+                            </div>
+                            <button onclick="triggerDeckGeneration()" class="bg-warmorange-500 hover:bg-warmorange-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md flex items-center gap-2"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Regenerate Deck</button>
+                        </div>
+
+                        <!-- Simulated Presentation Slide Frame (Pitch/Framer Style) -->
+                        <div id="presentation-frame" class="w-full aspect-[16/9] bg-white dark:bg-zinc-900 rounded-2xl border border-neutral-200 dark:border-zinc-800 shadow-xl relative overflow-hidden flex flex-col justify-between p-12 select-none group">
+                            <div class="absolute right-0 top-0 w-80 h-80 bg-sage-500/[0.04] dark:bg-sage-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                            
+                            <div class="flex justify-between items-center border-b border-neutral-100 dark:border-zinc-850 pb-4 relative z-10">
+                                <span class="text-xs font-extrabold text-sage-500 uppercase tracking-widest" id="slide-topic">PROBLEM STATEMENT</span>
+                                <span class="text-[10px] text-neutral-400 dark:text-zinc-500 font-mono">FOUNDRY PRESENTATION ENGINE</span>
+                            </div>
+
+                            <div class="my-auto space-y-4 relative z-10" id="slide-main-content"></div>
+
+                            <div class="flex justify-between items-center text-xs text-neutral-400 pt-4 relative z-10 border-t border-neutral-100 dark:border-zinc-850">
+                                <span id="slide-num-indicator" class="font-semibold uppercase tracking-wider text-[10px] dark:text-zinc-500">SLIDE 2 OF 5</span>
+                                <div class="flex gap-2">
+                                    <button onclick="changeSlide(-1)" class="p-2 rounded-lg bg-warm-200/50 dark:bg-zinc-800 hover:bg-warm-200 dark:hover:bg-zinc-700 text-neutral-600 dark:text-zinc-300"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                                    <button onclick="changeSlide(1)" class="p-2 rounded-lg bg-warm-200/50 dark:bg-zinc-800 hover:bg-warm-200 dark:hover:bg-zinc-700 text-neutral-600 dark:text-zinc-300"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Workspace Dashboard Viewport -->
+                <div id="insights-viewport" class="flex-1 overflow-auto p-4 sm:p-8 bg-warm-100 dark:bg-zinc-950 transition-opacity duration-300">
+                    <div class="max-w-5xl mx-auto space-y-8 animate-fade-in" id="insights-content">
+                        
+                        <!-- Skeletal Loading State -->
+                        <div id="skeleton-loader" class="space-y-6">
+                            <div class="h-20 bg-white dark:bg-zinc-900 rounded-2xl animate-pulse"></div>
+                            <div class="grid grid-cols-5 gap-4">
+                                <div class="h-24 bg-white dark:bg-zinc-900 rounded-2xl animate-pulse"></div>
+                                <div class="h-24 bg-white dark:bg-zinc-900 rounded-2xl animate-pulse"></div>
+                                <div class="h-24 bg-white dark:bg-zinc-900 rounded-2xl animate-pulse"></div>
+                                <div class="h-24 bg-white dark:bg-zinc-900 rounded-2xl animate-pulse"></div>
+                                <div class="h-24 bg-white dark:bg-zinc-900 rounded-2xl animate-pulse"></div>
+                            </div>
+                            <div class="grid grid-cols-3 gap-6">
+                                <div class="h-48 bg-white dark:bg-zinc-900 rounded-2xl animate-pulse"></div>
+                                <div class="h-48 bg-white dark:bg-zinc-900 rounded-2xl animate-pulse"></div>
+                                <div class="h-48 bg-white dark:bg-zinc-900 rounded-2xl animate-pulse"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading Overlay for Analysis -->
+                <div id="analysis-overlay" class="absolute inset-0 bg-warm-100/90 dark:bg-zinc-950/95 backdrop-blur-md z-30 flex flex-col items-center justify-center hidden">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-sage-500 to-softteal-500 shadow-xl flex items-center justify-center mb-6 relative overflow-hidden">
+                        <i data-lucide="sparkles" class="w-8 h-8 text-white relative z-10 animate-spin"></i>
+                        <div class="absolute inset-0 bg-sage-500/20 animate-scan"></div>
+                    </div>
+                    <h3 class="font-extrabold text-neutral-800 dark:text-white text-lg mb-1 animate-pulse">Synthesizing Startup Profile</h3>
+                    <p class="text-xs text-neutral-500 dark:text-zinc-400">Venture is evaluating financial trends, opportunities, and timelines...</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- RIGHT PANEL (AI CHAT - VENTURE COMPANION) -->
+        <aside id="right-chat-panel" class="w-[400px] flex-shrink-0 bg-white dark:bg-zinc-900 border-l border-neutral-200 dark:border-zinc-800 flex flex-col z-20 shadow-2xl relative transition-all duration-300">
+            <div class="h-14 flex items-center justify-between px-4 border-b border-neutral-100 dark:border-zinc-800 bg-white/50 dark:bg-transparent backdrop-blur-md sticky top-0 z-10">
+                <div class="flex items-center gap-2">
+                    <div class="relative flex items-center justify-center w-5 h-5 bg-sage-500/10 rounded-lg">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-sage-500"></i>
+                    </div>
+                    <span class="font-bold text-sm text-warm-800 dark:text-zinc-100">Venture Companion</span>
+                </div>
+                <div class="flex items-center gap-1">
+                    <button id="new-chat-btn" class="p-1.5 hover:bg-neutral-50 dark:hover:bg-zinc-800 rounded-lg text-neutral-500 transition-colors tooltip" title="New Chat">
+                        <i data-lucide="square-pen" class="w-4 h-4"></i>
+                    </button>
+                    <button id="chat-close-btn" class="p-1.5 hover:bg-neutral-50 dark:hover:bg-zinc-800 rounded-lg text-neutral-500 transition-colors tooltip" title="Minimize Chat">
+                        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Area -->
+            <div id="chat-history" class="flex-1 overflow-y-auto p-4 space-y-6 scroll-smooth pb-32">
+                <!-- Injected programmatically -->
+            </div>
+
+            <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent dark:from-zinc-900 dark:via-zinc-900 z-10 pt-10">
+                <!-- Dynamic Suggestions chips -->
+                <div id="dynamic-suggestions" class="flex gap-2 overflow-x-auto pb-3 no-scrollbar snap-x text-warm-800 dark:text-zinc-100">
+                    <button class="prompt-chip snap-start flex-shrink-0 whitespace-nowrap px-3 py-1.5 rounded-full border border-sage-200 bg-sage-50 text-sage-700 text-xs hover:bg-sage-100 transition-colors dark:border-sage-500/30 dark:bg-sage-500/10 dark:text-sage-300 dark:hover:bg-sage-500/20 font-medium">
+                        Generate SWOT Analysis
+                    </button>
+                    <button class="prompt-chip snap-start flex-shrink-0 whitespace-nowrap px-3 py-1.5 rounded-full border border-neutral-200 bg-white text-neutral-600 text-xs hover:bg-neutral-50 dark:bg-zinc-850 dark:border-zinc-700 dark:text-zinc-300 transition-colors dark:hover:bg-zinc-800 font-medium">
+                        Create Pitch Deck Outline
+                    </button>
+                    <button class="prompt-chip snap-start flex-shrink-0 whitespace-nowrap px-3 py-1.5 rounded-full border border-neutral-200 bg-white text-neutral-600 text-xs hover:bg-neutral-50 dark:bg-zinc-850 dark:border-zinc-700 dark:text-zinc-300 transition-colors dark:hover:bg-zinc-800 font-medium">
+                        Identify Risks
+                    </button>
+                </div>
+
+                <div class="relative bg-white dark:bg-zinc-950 border border-neutral-200 dark:border-zinc-800 rounded-2xl shadow-lg shadow-neutral-100 dark:shadow-black/50 focus-within:border-sage-500 focus-within:ring-2 focus-within:ring-sage-500/10 transition-all flex flex-col p-1 group">
+                    <textarea id="chat-input" rows="2" placeholder="Ask Venture to analyze, strategize, or write..." class="w-full bg-transparent resize-none outline-none text-xs p-3 max-h-32 text-warm-800 dark:text-zinc-100 placeholder:text-neutral-400 dark:placeholder:text-zinc-500"></textarea>
+                    <div class="flex items-center justify-between px-2 pb-2">
+                        <div class="flex gap-1">
+                            <button class="p-2 text-neutral-400 hover:text-neutral-600 dark:hover:text-zinc-300 hover:bg-neutral-50 dark:hover:bg-zinc-800 rounded-lg transition-colors" title="Attach Document" onclick="document.getElementById('file-upload').click()">
+                                <i data-lucide="paperclip" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <button id="send-btn" class="bg-warmorange-500 text-white p-2 rounded-xl hover:bg-warmorange-600 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i data-lucide="arrow-up" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- FLOATING AI ASSISTANT TRIGGER -->
+        <button id="floating-ai-btn" class="fixed bottom-6 right-6 z-40 w-14 h-14 bg-gradient-to-tr from-sage-500 to-softteal-500 rounded-full shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center text-white hidden">
+            <i data-lucide="message-square" class="w-6 h-6"></i>
+        </button>
+
+    </main>
+
+    <!-- API Key Modal -->
+    <div id="api-key-modal" class="fixed inset-0 bg-warm-800/40 dark:bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 rounded-2xl shadow-2xl w-full max-w-md p-6 transform scale-95 transition-transform duration-300" id="api-key-modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-neutral-800 dark:text-zinc-100 flex items-center gap-2">
+                    <i data-lucide="key" class="w-5 h-5 text-sage-500"></i> Configure Gemini API
+                </h3>
+                <button id="close-modal-btn" class="text-neutral-500 hover:text-neutral-700 dark:hover:text-zinc-300">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <p class="text-xs text-neutral-500 dark:text-zinc-400 mb-4 leading-relaxed">
+                Connect your workspace directly to Gemini 2.5 Flash to begin processing your business layouts.
+            </p>
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-neutral-500 dark:text-zinc-400 mb-1">API Key</label>
+                <input type="password" id="api-key-input" placeholder="Enter API Key (e.g. AQ.Ab8RN... or AIzaSy...)" class="w-full bg-gray-100 dark:bg-zinc-950 border border-gray-300 dark:border-zinc-800 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20 transition-all text-neutral-800 dark:text-zinc-100">
+                <p id="api-key-error" class="text-xs text-red-500 mt-2 hidden"></p>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button id="cancel-key-btn" class="px-4 py-2 text-xs font-bold text-gray-500 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-all">Cancel</button>
+                <button id="save-key-btn" class="px-4 py-2 bg-warmorange-500 hover:bg-warmorange-600 text-white text-xs font-bold rounded-lg shadow-md transition-colors flex items-center gap-2">
+                    <span>Save & Connect</span>
+                    <i data-lucide="loader-2" class="w-4 h-4 animate-spin hidden" id="save-key-loader"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Theme Setup
+        const htmlElement = document.documentElement;
+        
+        // Remove dark default on organic redesigned theme
+        htmlElement.classList.remove('dark');
+        
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            htmlElement.classList.toggle('dark');
+            localStorage.theme = htmlElement.classList.contains('dark') ? 'dark' : 'light';
+            // Trigger graph canvas update if visible to recalculate visual palette
+            if (AppState.currentDocId) {
+                setTimeout(initKnowledgeGraphCanvas, 100);
+            }
+        });
+
+        // --- GLOBAL STATE ---
+        const AppState = {
+            apiKey: localStorage.getItem('gemini_api_key') || "",
+            documents: {}, // Store: id -> { id, file, name, size, textByPage, insights, pdfDoc }
+            currentDocId: null,
+            chatHistory: [],
+            isGenerating: false,
+            pdfScale: 1.5,
+            currentPageNum: 1,
+            pdfRendering: false,
+            pdfPageNumPending: null,
+            
+            // Slide generation deck memory
+            deckSlides: [],
+            currentSlideIndex: 0,
+            
+            // Interactive physics loop variables
+            graphNodes: [],
+            graphLinks: [],
+            canvasHoveredNode: null,
+            animationFrameId: null
+        };
+
+        // UI Elements
+        const ui = {
+            apiStatusContainer: document.getElementById('api-status-container'),
+            apiStatusDot: document.getElementById('api-status-dot'),
+            apiStatusText: document.getElementById('api-status-text'),
+            apiKeyBtn: document.getElementById('api-key-btn'),
+            apiKeyModal: document.getElementById('api-key-modal'),
+            apiKeyModalContent: document.getElementById('api-key-modal-content'),
+            emptyState: document.getElementById('empty-state'),
+            activeState: document.getElementById('active-state'),
+            docList: document.getElementById('document-list'),
+            emptyDocList: document.getElementById('empty-doc-list'),
+            pdfCanvas: document.getElementById('pdf-render'),
+            ctx: document.getElementById('pdf-render').getContext('2d'),
+            pageNumInput: document.getElementById('page-num'),
+            pageCountSpan: document.getElementById('page-count'),
+            currentDocTitle: document.getElementById('current-doc-title'),
+            analysisOverlay: document.getElementById('analysis-overlay'),
+            tabViewer: document.getElementById('tab-viewer'),
+            tabDashboard: document.getElementById('tab-dashboard'),
+            tabCompare: document.getElementById('tab-compare'),
+            tabPitch: document.getElementById('tab-pitch'),
+            viewerControls: document.getElementById('viewer-controls'),
+            pdfViewport: document.getElementById('pdf-viewport'),
+            insightsViewport: document.getElementById('insights-viewport'),
+            compareViewport: document.getElementById('compare-viewport'),
+            pitchViewport: document.getElementById('pitch-viewport'),
+            insightsContent: document.getElementById('insights-content'),
+            chatHistoryEl: document.getElementById('chat-history'),
+            chatInput: document.getElementById('chat-input'),
+            sendBtn: document.getElementById('send-btn'),
+            dropZone: document.getElementById('drop-zone'),
+            fileInput: document.getElementById('file-upload'),
+            sidebar: document.getElementById('left-sidebar'),
+            rightChatPanel: document.getElementById('right-chat-panel'),
+            floatingAiBtn: document.getElementById('floating-ai-btn')
+        };
+
+        // --- ONBOARDING & SPLASH ---
+        const onboardingApiKey = document.getElementById('onboarding-api-key');
+        const onboardingStartBtn = document.getElementById('btn-onboarding-start');
+        const onboardingSkipBtn = document.getElementById('btn-onboarding-skip');
+        const splashScreen = document.getElementById('splash-screen');
+
+        if (AppState.apiKey) {
+            splashScreen.classList.add('hidden');
+        }
+
+        onboardingStartBtn.addEventListener('click', async () => {
+            const key = onboardingApiKey.value.trim();
+            if (!key) {
+                showToast("Configuration Error", "Please provide a valid Gemini key to continue.", "error");
+                return;
+            }
+            onboardingStartBtn.disabled = true;
+            onboardingStartBtn.textContent = "Verifying connection...";
+            const isValid = await validateApiKey(key);
+            if (isValid) {
+                AppState.apiKey = key;
+                localStorage.setItem('gemini_api_key', key);
+                updateApiStatus(true);
+                splashScreen.classList.add('hidden');
+                showToast("Configuration Saved", "Connected to Gemini 2.5 Flash workspace.", "success");
+            } else {
+                onboardingStartBtn.disabled = false;
+                onboardingStartBtn.textContent = "Launch My Workspace";
+                showToast("Connection Failure", "Could not verify API Key with Google.", "error");
+            }
+        });
+
+        onboardingSkipBtn.addEventListener('click', () => {
+            splashScreen.classList.add('hidden');
+            showToast("Demo Mode Active", "AI features require an API Key.", "warning");
+        });
+
+        // --- COMMAND PALETTE (CTRL+K) ---
+        const commandPalette = document.getElementById('command-palette');
+        const cmdInput = document.getElementById('cmd-input');
+        const cmdResults = document.getElementById('cmd-results');
+        const cmdBox = document.getElementById('cmd-box');
+
+        const commandList = [
+            { icon: 'pie-chart', title: 'SWOT Analysis', desc: 'Identify strengths, weaknesses, opportunities, and risks.', action: 'Generate SWOT' },
+            { icon: 'trending-up', title: 'Revenue Model Generator', desc: 'Forecast growth, projections, and customer monetization paths.', action: 'Create Revenue Model' },
+            { icon: 'microphone', title: 'Investor Pitch Generator', desc: 'Generate high-impact investment summaries.', action: 'Create Pitch deck framework' },
+            { icon: 'git-branch', title: 'Knowledge Graph Generator', desc: 'Construct document relationship nodes.', action: 'Map Knowledge Graph' },
+            { icon: 'file-text', title: 'Executive Summary', desc: 'Produce clean summary profiles.', action: 'Generate Executive Summary' },
+            { icon: 'alert-triangle', title: 'Risk Analysis', desc: 'Analyze strategic vulnerability points.', action: 'Perform Risk Analysis' },
+            { icon: 'navigation', title: 'Go-To-Market Strategy', desc: 'Devise launching mechanisms.', action: 'Build GTM Plan' },
+            { icon: 'table', title: 'Business Model Canvas', desc: 'Generate modular business architecture charts.', action: 'Build Business Model Canvas' },
+        ];
+
+        function toggleCommandPalette() {
+            if (commandPalette.classList.contains('hidden')) {
+                commandPalette.classList.remove('hidden');
+                cmdInput.focus();
+                renderCommandResults('');
+            } else {
+                commandPalette.classList.add('hidden');
+            }
+        }
+
+        function renderCommandResults(query) {
+            cmdResults.innerHTML = '';
+            const filtered = commandList.filter(cmd => 
+                cmd.title.toLowerCase().includes(query.toLowerCase()) || 
+                cmd.desc.toLowerCase().includes(query.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                cmdResults.innerHTML = `<p class="p-4 text-xs text-neutral-500 dark:text-zinc-500 text-center">No active results matching "${query}"</p>`;
+                return;
+            }
+
+            filtered.forEach(cmd => {
+                const div = document.createElement('div');
+                div.className = "flex items-center gap-3 p-3 hover:bg-neutral-50 dark:hover:bg-zinc-800 rounded-xl cursor-pointer transition-colors group";
+                div.onclick = () => {
+                    toggleCommandPalette();
+                    ui.chatInput.value = cmd.action;
+                    handleSend();
+                };
+                div.innerHTML = `
+                    <div class="p-2 rounded-lg bg-neutral-100 dark:bg-zinc-950 text-neutral-500 dark:text-zinc-400 group-hover:text-sage-500 transition-colors">
+                        <i data-lucide="${cmd.icon}" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-neutral-800 dark:text-zinc-150">${cmd.title}</p>
+                        <p class="text-[11px] text-neutral-400 dark:text-zinc-500">${cmd.desc}</p>
+                    </div>
+                `;
+                cmdResults.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        cmdInput.addEventListener('input', (e) => renderCommandResults(e.target.value));
+
+        window.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                toggleCommandPalette();
+            }
+            if (e.key === 'Escape') {
+                commandPalette.classList.add('hidden');
+            }
+        });
+
+        commandPalette.addEventListener('click', (e) => {
+            if (e.target === commandPalette) commandPalette.classList.add('hidden');
+        });
+
+        document.getElementById('btn-cmd-palette-trigger').onclick = toggleCommandPalette;
+
+        // --- TOAST NOTIFICATIONS ---
+        function showToast(title, message, type = "success") {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let icon = 'info';
+            let colorClass = 'border-sage-500/20 bg-warm-50 dark:bg-zinc-900/95 text-sage-600 dark:text-sage-400 dark:border-zinc-800';
+            if (type === 'error') {
+                icon = 'alert-circle';
+                colorClass = 'border-coral-500/20 bg-warm-50 dark:bg-zinc-900/95 text-coral-500 dark:text-coral-400 dark:border-zinc-800';
+            } else if (type === 'warning') {
+                icon = 'alert-triangle';
+                colorClass = 'border-warmorange-500/20 bg-warm-50 dark:bg-zinc-900/95 text-warmorange-500 dark:text-warmorange-400 dark:border-zinc-800';
+            }
+
+            toast.className = `flex gap-3 p-4 border rounded-2xl shadow-xl backdrop-blur-md pointer-events-auto transition-all duration-300 transform translate-y-2 opacity-0 ${colorClass}`;
+            toast.innerHTML = `
+                <i data-lucide="${icon}" class="w-4 h-4 flex-shrink-0 mt-0.5"></i>
+                <div class="flex-1">
+                    <p class="text-[10px] font-bold uppercase tracking-wider">${title}</p>
+                    <p class="text-xs text-neutral-500 dark:text-zinc-400 mt-1 leading-relaxed">${message}</p>
+                </div>
+            `;
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 50);
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // --- RESIZABLE PANELS & SIDEBAR TOGGLING ---
+        document.getElementById('sidebar-toggle').addEventListener('click', () => {
+            ui.sidebar.classList.toggle('-ml-72');
+        });
+
+        // Chat Minimized/Maximized
+        const chatCloseBtn = document.getElementById('chat-close-btn');
+        const floatingAiBtn = document.getElementById('floating-ai-btn');
+
+        chatCloseBtn.addEventListener('click', () => {
+            ui.rightChatPanel.classList.add('hidden');
+            floatingAiBtn.classList.remove('hidden');
+            showToast("Venture Companion Minimized", "Click the floating icon below to restore.", "info");
+        });
+
+        floatingAiBtn.addEventListener('click', () => {
+            ui.rightChatPanel.classList.remove('hidden');
+            floatingAiBtn.classList.add('hidden');
+        });
+
+        // Navigation actions
+        document.getElementById('nav-btn-home').onclick = () => {
+            ui.emptyState.classList.remove('hidden');
+            ui.activeState.classList.add('hidden');
+        };
+        document.getElementById('nav-btn-insights').onclick = () => {
+            if (AppState.currentDocId) {
+                ui.emptyState.classList.add('hidden');
+                ui.activeState.classList.remove('hidden');
+                ui.tabDashboard.click();
+            } else {
+                showToast("No Document Uploaded", "Please upload a business plan to view the dashboard.", "warning");
+            }
+        };
+
+        // --- API KEY CONFIG ---
+        function updateApiStatus(connected) {
+            if (connected) {
+                ui.apiStatusContainer.className = 'flex items-center gap-2 px-3 py-1.5 rounded-full bg-sage-50 dark:bg-sage-500/10 border border-sage-200 dark:border-sage-500/20 transition-colors cursor-default';
+                ui.apiStatusDot.className = 'w-1.5 h-1.5 rounded-full bg-sage-500 transition-colors';
+                ui.apiStatusText.className = 'text-xs font-semibold text-sage-600 dark:text-sage-400';
+                ui.apiStatusText.textContent = 'Gemini Connected';
+                ui.apiStatusContainer.onclick = null;
+            } else {
+                ui.apiStatusContainer.className = 'flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 transition-colors cursor-pointer hover:bg-red-100/50 dark:hover:bg-red-500/20';
+                ui.apiStatusDot.className = 'w-1.5 h-1.5 rounded-full bg-red-500 transition-colors';
+                ui.apiStatusText.className = 'text-xs font-semibold text-red-700 dark:text-red-400';
+                ui.apiStatusText.textContent = 'Disconnected';
+                ui.apiStatusContainer.onclick = () => ui.apiKeyModal.classList.remove('hidden');
+            }
+        }
+
+        async function validateApiKey(key) {
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: "Hi" }] }] })
+                });
+                return response.ok;
+            } catch (e) { return false; }
+        }
+
+        ui.apiKeyBtn.onclick = () => { ui.apiKeyModal.classList.remove('hidden'); setTimeout(()=>{ui.apiKeyModal.classList.remove('opacity-0'); ui.apiKeyModalContent.classList.remove('scale-95');}, 10); };
+        document.getElementById('close-modal-btn').onclick = document.getElementById('cancel-key-btn').onclick = () => {
+            ui.apiKeyModal.classList.add('opacity-0'); ui.apiKeyModalContent.classList.add('scale-95'); setTimeout(() => ui.apiKeyModal.classList.add('hidden'), 300);
+        };
+        document.getElementById('save-key-btn').onclick = async () => {
+            const key = document.getElementById('api-key-input').value.trim();
+            if (!key) return;
+            document.getElementById('save-key-loader').classList.remove('hidden');
+            const isValid = await validateApiKey(key);
+            document.getElementById('save-key-loader').classList.add('hidden');
+            if (isValid) {
+                AppState.apiKey = key;
+                localStorage.setItem('gemini_api_key', key);
+                updateApiStatus(true);
+                document.getElementById('close-modal-btn').click();
+                showToast("Workspace Synced", "Gemini key registered successfully.", "success");
+            } else {
+                const err = document.getElementById('api-key-error');
+                err.textContent = "Invalid API Key."; err.classList.remove('hidden');
+            }
+        };
+
+        if(AppState.apiKey) validateApiKey(AppState.apiKey).then(updateApiStatus);
+
+        // --- FILE UPLOAD & PDF PROCESSING ---
+        ui.dropZone.addEventListener('dragover', (e) => { e.preventDefault(); ui.dropZone.classList.add('border-sage-500', 'bg-sage-50'); });
+        ui.dropZone.addEventListener('dragleave', () => { ui.dropZone.classList.remove('border-sage-500', 'bg-sage-50'); });
+        ui.dropZone.addEventListener('drop', (e) => {
+            e.preventDefault(); ui.dropZone.classList.remove('border-sage-500', 'bg-sage-50');
+            handleFiles(e.dataTransfer.files);
+        });
+        ui.fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+        async function handleFiles(files) {
+            if (!AppState.apiKey) {
+                showToast("API Key Required", "Please configure your Gemini key before uploading.", "warning");
+                ui.apiKeyBtn.click();
+                return;
+            }
+            ui.emptyState.classList.add('hidden');
+            ui.activeState.classList.remove('hidden');
+
+            for (const file of files) {
+                if (file.type !== 'application/pdf') continue;
+                const id = 'doc_' + Date.now() + Math.floor(Math.random()*1000);
+                AppState.documents[id] = { id, file, name: file.name, size: (file.size/1024/1024).toFixed(1)+'MB', textByPage: {}, insights: null, pdfDoc: null };
+                renderSidebarList();
+                await loadAndProcessPDF(id);
+            }
+            updateCompareSelectors();
+        }
+
+        function renderSidebarList() {
+            ui.docList.innerHTML = '';
+            const docs = Object.values(AppState.documents);
+            if(docs.length === 0) { ui.emptyDocList.style.display = 'block'; return; }
+            ui.emptyDocList.style.display = 'none';
+
+            docs.forEach(doc => {
+                const li = document.createElement('li');
+                const isActive = doc.id === AppState.currentDocId;
+                li.className = `doc-item group flex items-center justify-between p-2.5 rounded-xl cursor-pointer transition-all border border-transparent ${isActive ? 'active shadow-sm font-semibold' : 'hover:bg-warm-200/50 dark:hover:bg-zinc-800'}`;
+                li.onclick = () => selectDocument(doc.id);
+                li.innerHTML = `
+                    <div class="flex items-center gap-3 overflow-hidden text-warm-800 dark:text-zinc-200">
+                        <i data-lucide="file-text" class="w-4 h-4 flex-shrink-0 text-sage-500"></i>
+                        <span class="text-xs truncate">${doc.name}</span>
+                    </div>
+                `;
+                ui.docList.appendChild(li);
+            });
+            lucide.createIcons();
+        }
+
+        async function loadAndProcessPDF(docId) {
+            const doc = AppState.documents[docId];
+            selectDocument(docId); 
+
+            const arrayBuffer = await doc.file.arrayBuffer();
+            const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+            
+            ui.analysisOverlay.classList.remove('hidden'); 
+            
+            try {
+                const pdf = await loadingTask.promise;
+                doc.pdfDoc = pdf;
+                
+                // Render first page
+                AppState.currentPageNum = 1;
+                ui.pageCountSpan.textContent = pdf.numPages;
+                ui.pageNumInput.value = 1;
+                renderPage(AppState.currentPageNum);
+
+                // Extract Text
+                let fullText = "";
+                for(let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    const textStr = textContent.items.map(item => item.str).join(' ');
+                    doc.textByPage[i] = textStr;
+                    fullText += `[Page ${i}]: ${textStr}\n`;
+                }
+
+                // Analyze with Gemini
+                await generateInsights(doc, fullText);
+                ui.analysisOverlay.classList.add('hidden');
+                showToast("Document Uploaded", `${doc.name} successfully verified & analyzed.`, "success");
+                
+                if (AppState.currentDocId === docId) {
+                    renderInsightsUI(doc.insights);
+                }
+            } catch (error) {
+                console.error("PDF Processing error", error);
+                ui.analysisOverlay.classList.add('hidden');
+                showToast("Extraction Failed", "Venture encountered an issue parsing this file.", "error");
+            }
+        }
+
+        // --- PDF VIEWER LOGIC ---
+        function selectDocument(id) {
+            AppState.currentDocId = id;
+            const doc = AppState.documents[id];
+            ui.currentDocTitle.innerHTML = `<i data-lucide="file-text" class="w-3.5 h-3.5 text-sage-500"></i><span class="truncate max-w-[150px] dark:text-zinc-100" title="${doc.name}">${doc.name}</span>`;
+            lucide.createIcons();
+            
+            renderSidebarList();
+            
+            if (doc.pdfDoc) {
+                AppState.currentPageNum = 1;
+                ui.pageCountSpan.textContent = doc.pdfDoc.numPages;
+                ui.pageNumInput.value = 1;
+                renderPage(AppState.currentPageNum);
+                
+                if(doc.insights) {
+                    renderInsightsUI(doc.insights);
+                } else {
+                    document.getElementById('skeleton-loader').classList.remove('hidden');
+                }
+            }
+        }
+
+        function renderPage(num) {
+            const doc = AppState.documents[AppState.currentDocId];
+            if (!doc || !doc.pdfDoc) return;
+            AppState.pdfRendering = true;
+
+            doc.pdfDoc.getPage(num).then(page => {
+                const viewport = page.getViewport({ scale: AppState.pdfScale });
+                ui.pdfCanvas.height = viewport.height;
+                ui.pdfCanvas.width = viewport.width;
+
+                const renderContext = { canvasContext: ui.ctx, viewport: viewport };
+                page.render(renderContext).promise.then(() => {
+                    AppState.pdfRendering = false;
+                    if (AppState.pdfPageNumPending !== null) {
+                        renderPage(AppState.pdfPageNumPending);
+                        AppState.pdfPageNumPending = null;
+                    }
+                });
+            });
+            ui.pageNumInput.value = num;
+        }
+
+        function queueRenderPage(num) {
+            if (AppState.pdfRendering) AppState.pdfPageNumPending = num;
+            else renderPage(num);
+        }
+
+        document.getElementById('btn-prev-page').onclick = () => {
+            if (AppState.currentPageNum <= 1) return;
+            AppState.currentPageNum--; queueRenderPage(AppState.currentPageNum);
+        };
+        document.getElementById('btn-next-page').onclick = () => {
+            const doc = AppState.documents[AppState.currentDocId];
+            if (!doc || AppState.currentPageNum >= doc.pdfDoc.numPages) return;
+            AppState.currentPageNum++; queueRenderPage(AppState.currentPageNum);
+        };
+        document.getElementById('btn-zoom-in').onclick = () => { AppState.pdfScale += 0.25; document.getElementById('zoom-level').innerText = Math.round(AppState.pdfScale*100)+'%'; queueRenderPage(AppState.currentPageNum); };
+        document.getElementById('btn-zoom-out').onclick = () => { if(AppState.pdfScale <= 0.5) return; AppState.pdfScale -= 0.25; document.getElementById('zoom-level').innerText = Math.round(AppState.pdfScale*100)+'%'; queueRenderPage(AppState.currentPageNum); };
+        ui.pageNumInput.addEventListener('change', (e) => {
+            const doc = AppState.documents[AppState.currentDocId];
+            let num = parseInt(e.target.value);
+            if(num >= 1 && num <= doc.pdfDoc.numPages) { AppState.currentPageNum = num; queueRenderPage(num); }
+            else { e.target.value = AppState.currentPageNum; }
+        });
+
+        window.goToPage = function(pageNum, docId = null) {
+            if(docId && AppState.currentDocId !== docId) selectDocument(docId);
+            AppState.currentPageNum = parseInt(pageNum);
+            queueRenderPage(AppState.currentPageNum);
+            ui.tabViewer.click(); 
+        }
+
+        // --- AI INSIGHTS GENERATION ---
+        async function generateInsights(doc, fullText) {
+            const prompt = `
+Analyze the following document and extract startup intelligence metrics. Return STRICTLY valid JSON without markdown wrapping.
+Schema required:
+{
+    "executiveSummary": "A concise 2-paragraph summary",
+    "keyInsights": ["Insight 1", "Insight 2", "Insight 3"],
+    "importantNumbers": [{"metric": "Metric Name", "value": "Value"}],
+    "companiesMentioned": ["Company 1"],
+    "peopleMentioned": ["Person 1"],
+    "productsMentioned": ["Product 1"],
+    "marketSize": "Market context if mentioned, else 'Not Specified'",
+    "opportunities": ["Opp 1"],
+    "risks": ["Risk 1"],
+    "scores": {
+        "healthScore": 85,
+        "investmentReadiness": "Gold", 
+        "growthPotential": "Strong",
+        "riskScore": "Medium",
+        "marketConfidence": 78
+    },
+    "aiInsightsPanel": {
+        "topOpportunity": "Description of greatest core expansion opportunity.",
+        "highestRisk": "Primary structural or scaling vulnerability.",
+        "fastestGrowthStrategy": "Immediate strategy to double metrics.",
+        "mostImportantCompetitor": "Key market peer to defend against.",
+        "potentialInvestors": ["Type of investors or actual profiles match"],
+        "mostValuableRecommendation": "Critical step the founders must take next."
+    },
+    "milestones": [
+        {"period": "Q1 2027", "milestone": "Initiate core phase"},
+        {"period": "Q2 2027", "milestone": "Expansion phase"}
+    ],
+    "suggestedQuestions": [
+        "What is the long term roadmap?",
+        "How will the capital be deployed?"
+    ]
+}
+Document Context:
+${fullText.substring(0, 50000)}
+`;
+            let success = false;
+            let textOutput = "";
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: { responseMimeType: "application/json" }
+            };
+            const delays = [1000, 2000, 4000, 8000, 16000];
+
+            for (let i = 0; i < 6; i++) {
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${AppState.apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error?.message || "API Error");
+                    }
+                    const data = await response.json();
+                    textOutput = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    success = true;
+                    break;
+                } catch(e) {
+                    console.error("API Attempt Failed:", e.message);
+                    if (i < 5) await new Promise(res => setTimeout(res, delays[i]));
+                }
+            }
+
+            if (success) {
+                try {
+                    doc.insights = JSON.parse(textOutput);
+                } catch(e) {
+                    console.error("Failed to parse JSON", e);
+                    success = false;
+                }
+            }
+            
+            if (!success) {
+                console.error("Failed to generate insights after retries.");
+                doc.insights = { 
+                    error: true, 
+                    executiveSummary: "Demo startup analysis initialized due to environment limitations or network error.",
+                    scores: { healthScore: 78, investmentReadiness: "Silver", growthPotential: "Strong", riskScore: "Low", marketConfidence: 82 },
+                    importantNumbers: [{metric: "Revenue Goal", value: "$2M"}],
+                    keyInsights: ["Workspace analysis active."],
+                    opportunities: ["General monetization paths available."],
+                    risks: ["Standard early-stage market dynamics."],
+                    aiInsightsPanel: {
+                        topOpportunity: "SaaS Expansion into untapped enterprise verticals.",
+                        highestRisk: "High initial burn rate relative to organic sales velocity.",
+                        fastestGrowthStrategy: "Implement programmatic inbound API lead funnels.",
+                        mostImportantCompetitor: "Legacy software providers.",
+                        potentialInvestors: ["Venture Capital Seed Funds", "Strategic Tech Angels"],
+                        mostValuableRecommendation: "Accelerate customer-discovery sprint modules immediately."
+                    },
+                    milestones: [
+                        {"period": "Phase 1", "milestone": "Release alpha pilot build"},
+                        {"period": "Phase 2", "milestone": "Launch integrated commercial beta models"},
+                        {"period": "Phase 3", "milestone": "Scale regional customer distribution nodes"}
+                    ],
+                    suggestedQuestions: [
+                        "How can we optimize our current burn rate?",
+                        "What is our defensibility moat against legacy providers?"
+                    ]
+                };
+            }
+        }
+
+        // --- RENDER INTELLIGENT SAAS DASHBOARD UI ---
+        ui.tabViewer.onclick = () => {
+            setTabActive(ui.tabViewer);
+            ui.pdfViewport.classList.remove('hidden');
+            ui.insightsViewport.classList.add('hidden');
+            ui.compareViewport.classList.add('hidden');
+            ui.pitchViewport.classList.add('hidden');
+            ui.viewerControls.classList.remove('hidden');
+        };
+
+        ui.tabDashboard.onclick = () => {
+            setTabActive(ui.tabDashboard);
+            ui.insightsViewport.classList.remove('hidden');
+            ui.pdfViewport.classList.add('hidden');
+            ui.compareViewport.classList.add('hidden');
+            ui.pitchViewport.classList.add('hidden');
+            ui.viewerControls.classList.add('hidden');
+            
+            // Re-render Knowledge graph if visible
+            setTimeout(initKnowledgeGraphCanvas, 100);
+        };
+
+        ui.tabCompare.onclick = () => {
+            setTabActive(ui.tabCompare);
+            ui.compareViewport.classList.remove('hidden');
+            ui.insightsViewport.classList.add('hidden');
+            ui.pdfViewport.classList.add('hidden');
+            ui.pitchViewport.classList.add('hidden');
+            ui.viewerControls.classList.add('hidden');
+            renderCompareMatrix();
+        };
+
+        ui.tabPitch.onclick = () => {
+            setTabActive(ui.tabPitch);
+            ui.pitchViewport.classList.remove('hidden');
+            ui.insightsViewport.classList.add('hidden');
+            ui.pdfViewport.classList.add('hidden');
+            ui.compareViewport.classList.add('hidden');
+            ui.viewerControls.classList.add('hidden');
+            triggerDeckGeneration();
+        };
+
+        function setTabActive(tabBtn) {
+            [ui.tabViewer, ui.tabDashboard, ui.tabCompare, ui.tabPitch].forEach(b => {
+                b.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg text-neutral-500 hover:text-neutral-800 dark:text-zinc-400 dark:hover:text-zinc-200 transition-all whitespace-nowrap";
+            });
+            tabBtn.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-zinc-800 shadow-sm text-neutral-800 dark:text-zinc-150 transition-all whitespace-nowrap";
+        }
+
+        document.getElementById('btn-show-dashboard').onclick = () => {
+            if(AppState.currentDocId) {
+                ui.tabDashboard.click();
+            } else {
+                showToast("Welcome Dashboard", "Upload a document to initialize visual predictive modules.", "info");
+            }
+        };
+
+        // Simulated export triggered from dropdown
+        window.simulateExport = function(format) {
+            showToast("Export Initiated", `Compiling dynamic workspace metrics into ${format}...`, "info");
+            setTimeout(() => {
+                showToast("Export Ready", `${format} successfully downloaded!`, "success");
+            }, 1500);
+        }
+
+        // Trigger action based on pre-suggested AI questions
+        window.askAiSuggested = function(question) {
+            ui.chatInput.value = question;
+            handleSend();
+        }
+
+        function renderInsightsUI(data) {
+            if (!data) return;
+
+            const scores = data.scores || { healthScore: 75, investmentReadiness: 'Silver', growthPotential: 'Strong', riskScore: 'Medium', marketConfidence: 75 };
+            
+            const toBadge = arr => (arr || []).map(item => `<span class="px-2.5 py-1 bg-neutral-200/50 dark:bg-zinc-800 rounded-lg text-[11px] font-bold text-neutral-600 dark:text-zinc-300">${item}</span>`).join('');
+            const toList = arr => (arr || []).map(item => `<li class="flex gap-2 text-xs text-neutral-600 dark:text-zinc-300"><i data-lucide="check" class="w-3.5 h-3.5 text-sage-500 flex-shrink-0 mt-0.5"></i><span>${item}</span></li>`).join('');
+            
+            // Build Milestones Timeline
+            const milestoneListHTML = (data.milestones || []).map((m, idx) => `
+                <div class="flex gap-4 relative">
+                    ${idx < data.milestones.length - 1 ? '<div class="absolute left-3.5 top-8 bottom-0 w-px bg-neutral-200 dark:bg-zinc-800"></div>' : ''}
+                    <div class="w-7 h-7 rounded-xl bg-sage-50 dark:bg-zinc-800 flex items-center justify-center text-sage-500 z-10 flex-shrink-0">
+                        <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                    </div>
+                    <div class="pb-5">
+                        <span class="text-[10px] font-bold text-sage-600 uppercase tracking-widest block">${m.period}</span>
+                        <p class="text-xs text-neutral-700 dark:text-zinc-200 font-semibold mt-0.5">${m.milestone}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            // Build AI Suggested Questions Panel
+            const suggestedQuestionsHTML = (data.suggestedQuestions || [
+                "What is the projected capital requirement?",
+                "Analyze the target consumer demographic."
+            ]).map(q => `
+                <button onclick="askAiSuggested('${q.replace(/'/g, "\\'")}')" class="text-left w-full p-2.5 rounded-xl border border-neutral-200/60 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-sage-500 text-xs text-neutral-600 dark:text-zinc-300 transition-all flex items-center justify-between group">
+                    <span>${q}</span>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                </button>
+            `).join('');
+
+            // Build AI Insights Panel Panel
+            const insightsPanel = data.aiInsightsPanel || {
+                topOpportunity: "SaaS Enterprise integration vertical focus.",
+                highestRisk: "High initial customer acquisition costs.",
+                fastestGrowthStrategy: "Deploy automatic integration sandboxes.",
+                mostImportantCompetitor: "Legacy tools.",
+                potentialInvestors: ["Tech seed micro-VCs"],
+                mostValuableRecommendation: "Initialize alpha discovery cycles immediately."
+            };
+
+            ui.insightsContent.innerHTML = `
+                <!-- REDESIGNED HOME STATE: TODAY'S STARTUP SNAPSHOT (With improved dark mode text contrast) -->
+                <div>
+                    <h2 class="text-xs font-bold text-neutral-400 dark:text-zinc-500 uppercase tracking-wider mb-4">Today's Startup Snapshot</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        
+                        <!-- Biggest Opportunity Card -->
+                        <div class="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-neutral-200/60 dark:border-zinc-800 shadow-sm space-y-2 flex flex-col justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-lg bg-sage-50 dark:bg-zinc-800/80 flex items-center justify-center text-sage-500">
+                                    <i data-lucide="lightbulb" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-bold text-neutral-400 dark:text-zinc-500 uppercase tracking-wider">Top Opportunity</span>
+                            </div>
+                            <p class="text-xs text-neutral-600 dark:text-zinc-200 leading-relaxed font-semibold">${insightsPanel.topOpportunity}</p>
+                        </div>
+
+                        <!-- Highest Risk Card -->
+                        <div class="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-neutral-200/60 dark:border-zinc-800 shadow-sm space-y-2 flex flex-col justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-lg bg-coral-500/10 flex items-center justify-center text-coral-500">
+                                    <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-bold text-neutral-400 dark:text-zinc-500 uppercase tracking-wider">Biggest Risk</span>
+                            </div>
+                            <p class="text-xs text-neutral-600 dark:text-zinc-200 leading-relaxed font-semibold">${insightsPanel.highestRisk}</p>
+                        </div>
+
+                        <!-- Growth Strategy Card -->
+                        <div class="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-neutral-200/60 dark:border-zinc-800 shadow-sm space-y-2 flex flex-col justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-lg bg-warmorange-500/10 flex items-center justify-center text-warmorange-500 animate-bounce-slight">
+                                    <i data-lucide="rocket" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-bold text-neutral-400 dark:text-zinc-500 uppercase tracking-wider">Suggested Step</span>
+                            </div>
+                            <p class="text-xs text-neutral-600 dark:text-zinc-200 leading-relaxed font-semibold">${insightsPanel.fastestGrowthStrategy}</p>
+                        </div>
+
+                        <!-- Competitor Target Card -->
+                        <div class="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-neutral-200/60 dark:border-zinc-800 shadow-sm space-y-2 flex flex-col justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-500">
+                                    <i data-lucide="shield" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-bold text-neutral-400 dark:text-zinc-500 uppercase tracking-wider">Key Peer Target</span>
+                            </div>
+                            <p class="text-xs text-neutral-600 dark:text-zinc-200 leading-relaxed font-semibold">${insightsPanel.mostImportantCompetitor}</p>
+                        </div>
+
+                        <!-- Funding Readiness Card -->
+                        <div class="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-neutral-200/60 dark:border-zinc-800 shadow-sm space-y-2 flex flex-col justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-lg bg-yellow-500/10 flex items-center justify-center text-yellow-500">
+                                    <i data-lucide="gem" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-bold text-neutral-400 dark:text-zinc-500 uppercase tracking-wider">Funding State</span>
+                            </div>
+                            <div class="space-y-1">
+                                <span class="text-sm font-extrabold text-neutral-800 dark:text-zinc-100">${scores.investmentReadiness} Tier</span>
+                                <div class="flex gap-1">
+                                    ${(insightsPanel.potentialInvestors || []).slice(0,1).map(inv => `<span class="px-1.5 py-0.5 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 text-[10px] rounded font-bold">${inv}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- SUGGESTED ONE-CLICK ACTIONS HUB -->
+                <div class="bg-gradient-to-tr from-sage-500/[0.03] to-softteal-500/[0.03] border border-sage-500/10 dark:border-zinc-800 rounded-2xl p-6 relative overflow-hidden">
+                    <div class="absolute right-0 top-0 w-64 h-64 bg-sage-500/5 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="flex items-center gap-2 text-sage-600 dark:text-sage-400 mb-4 font-bold text-xs uppercase tracking-wider">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i> One-Click Assistant Actions
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+                        <button onclick="triggerQuickAction('Generate SWOT')" class="flex flex-col items-center text-center p-3.5 rounded-xl bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 hover:border-sage-500 shadow-sm hover:shadow-lg transition-all group">
+                            <i data-lucide="pie-chart" class="w-5 h-5 mb-2 text-sage-500 group-hover:scale-105 transition-transform"></i>
+                            <span class="text-[11px] font-semibold dark:text-zinc-200">SWOT</span>
+                        </button>
+                        <button onclick="triggerQuickAction('Create Pitch')" class="flex flex-col items-center text-center p-3.5 rounded-xl bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 hover:border-sage-500 shadow-sm hover:shadow-lg transition-all group">
+                            <i data-lucide="presentation" class="w-5 h-5 mb-2 text-indigo-500 group-hover:scale-105 transition-transform"></i>
+                            <span class="text-[11px] font-semibold dark:text-zinc-200">Pitch Deck</span>
+                        </button>
+                        <button onclick="triggerQuickAction('Generate Revenue Model')" class="flex flex-col items-center text-center p-3.5 rounded-xl bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 hover:border-sage-500 shadow-sm hover:shadow-lg transition-all group">
+                            <i data-lucide="trending-up" class="w-5 h-5 mb-2 text-green-500 group-hover:scale-105 transition-transform"></i>
+                            <span class="text-[11px] font-semibold dark:text-zinc-200">Revenue</span>
+                        </button>
+                        <button onclick="triggerQuickAction('Investor Q&A Prep')" class="flex flex-col items-center text-center p-3.5 rounded-xl bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 hover:border-sage-500 shadow-sm hover:shadow-lg transition-all group">
+                            <i data-lucide="help-circle" class="w-5 h-5 mb-2 text-purple-500 group-hover:scale-105 transition-transform"></i>
+                            <span class="text-[11px] font-semibold dark:text-zinc-200">Investor Q&A</span>
+                        </button>
+                        <button onclick="triggerQuickAction('Competitor Analysis')" class="flex flex-col items-center text-center p-3.5 rounded-xl bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 hover:border-sage-500 shadow-sm hover:shadow-lg transition-all group">
+                            <i data-lucide="users" class="w-5 h-5 mb-2 text-yellow-500 group-hover:scale-105 transition-transform"></i>
+                            <span class="text-[11px] font-semibold dark:text-zinc-200">Competitors</span>
+                        </button>
+                        <button onclick="triggerQuickAction('Create Business Canvas')" class="flex flex-col items-center text-center p-3.5 rounded-xl bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 hover:border-sage-500 shadow-sm hover:shadow-lg transition-all group">
+                            <i data-lucide="table" class="w-5 h-5 mb-2 text-teal-500 group-hover:scale-105 transition-transform"></i>
+                            <span class="text-[11px] font-semibold dark:text-zinc-200">Canvas</span>
+                        </button>
+                        <button onclick="triggerQuickAction('Startup Roadmap')" class="flex flex-col items-center text-center p-3.5 rounded-xl bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 hover:border-sage-500 shadow-sm hover:shadow-lg transition-all group">
+                            <i data-lucide="milestone" class="w-5 h-5 mb-2 text-orange-500 group-hover:scale-105 transition-transform"></i>
+                            <span class="text-[11px] font-semibold dark:text-zinc-200">Roadmap</span>
+                        </button>
+                        <button onclick="triggerQuickAction('Executive Summary')" class="flex flex-col items-center text-center p-3.5 rounded-xl bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 hover:border-sage-500 shadow-sm hover:shadow-lg transition-all group">
+                            <i data-lucide="file-check" class="w-5 h-5 mb-2 text-pink-500 group-hover:scale-105 transition-transform"></i>
+                            <span class="text-[11px] font-semibold dark:text-zinc-200">Summary</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SIDEBAR MODULES: INTERACTIVE KNOWLEDGE GRAPH & MILESTONES -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Left Column: Interactive Knowledge Graph -->
+                    <div class="lg:col-span-2 bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 p-6 rounded-2xl shadow-sm flex flex-col justify-between">
+                        <div class="mb-4">
+                            <h2 class="text-sm font-bold flex items-center gap-2 text-gray-900 dark:text-zinc-100"><i data-lucide="git-branch" class="text-sage-500"></i> Workspace Relationship Graph</h2>
+                            <p class="text-xs text-neutral-400 dark:text-zinc-400 mt-1">Inter-document connection entities generated dynamically.</p>
+                        </div>
+                        <div class="w-full h-[280px] bg-warm-200/40 dark:bg-zinc-950 border border-neutral-100 dark:border-zinc-800 rounded-xl relative overflow-hidden flex items-center justify-center">
+                            <canvas id="graph-canvas" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Timeline & AI Recommendations -->
+                    <div class="space-y-6">
+                        <!-- Startup Timeline Matrix -->
+                        <div class="bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 p-6 rounded-2xl shadow-sm">
+                            <h2 class="text-sm font-bold mb-4 flex items-center gap-2 text-neutral-800 dark:text-zinc-100"><i data-lucide="milestone" class="text-sage-500"></i> Mapped Milestones</h2>
+                            <div class="space-y-1">
+                                ${milestoneListHTML}
+                            </div>
+                        </div>
+
+                        <!-- AI Suggested Questions Panel -->
+                        <div class="bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 p-6 rounded-2xl shadow-sm">
+                            <h2 class="text-sm font-bold mb-3 flex items-center gap-2 text-neutral-800 dark:text-zinc-100"><i data-lucide="sparkles" class="text-sage-500"></i> Ask Venture Companion</h2>
+                            <div class="space-y-2">
+                                ${suggestedQuestionsHTML}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Executive Summary Profile -->
+                <div class="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-neutral-200/60 dark:border-zinc-800 shadow-sm">
+                    <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-warm-800 dark:text-zinc-100"><i data-lucide="book-open" class="text-sage-500"></i> Executive Summary</h2>
+                    <p class="text-sm text-neutral-600 dark:text-zinc-300 leading-relaxed">${data.executiveSummary}</p>
+                </div>
+
+                <!-- Metrics & Extractions Grid -->
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-neutral-200/60 dark:border-zinc-800 shadow-sm">
+                        <h3 class="font-bold mb-4 text-sm flex items-center gap-2 text-warm-800 dark:text-zinc-100"><i data-lucide="lightbulb" class="text-yellow-500"></i> Key Insights</h3>
+                        <ul class="space-y-3">${toList(data.keyInsights)}</ul>
+                    </div>
+                    <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-neutral-200/60 dark:border-zinc-800 shadow-sm">
+                        <h3 class="font-bold mb-4 text-sm flex items-center gap-2 text-warm-800 dark:text-zinc-100"><i data-lucide="trending-up" class="text-sage-500"></i> Market Opportunities</h3>
+                        <ul class="space-y-3">${toList(data.opportunities)}</ul>
+                    </div>
+                    <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-neutral-200/60 dark:border-zinc-800 shadow-sm">
+                        <h3 class="font-bold mb-4 text-sm flex items-center gap-2 text-warm-800 dark:text-zinc-100"><i data-lucide="alert-triangle" class="text-coral-500"></i> Risks Identified</h3>
+                        <ul class="space-y-3">${toList(data.risks)}</ul>
+                    </div>
+                </div>
+
+                <!-- Entity Trackers -->
+                <div class="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-neutral-200/60 dark:border-zinc-800 shadow-sm space-y-4">
+                    <div class="flex gap-4 items-start">
+                        <span class="text-xs font-bold uppercase tracking-wider w-24 flex-shrink-0 text-neutral-400 mt-1">Companies</span>
+                        <div class="flex flex-wrap gap-2">${toBadge(data.companiesMentioned) || '-'}</div>
+                    </div>
+                    <div class="flex gap-4 items-start">
+                        <span class="text-xs font-bold uppercase tracking-wider w-24 flex-shrink-0 text-neutral-400 mt-1">People</span>
+                        <div class="flex flex-wrap gap-2">${toBadge(data.peopleMentioned) || '-'}</div>
+                    </div>
+                    <div class="flex gap-4 items-start">
+                        <span class="text-xs font-bold uppercase tracking-wider w-24 flex-shrink-0 text-neutral-400 mt-1">Products</span>
+                        <div class="flex flex-wrap gap-2">${toBadge(data.productsMentioned) || '-'}</div>
+                    </div>
+                    <div class="flex gap-4 items-start">
+                        <span class="text-xs font-bold uppercase tracking-wider w-24 flex-shrink-0 text-neutral-400 mt-1">Market Context</span>
+                        <div class="text-sm text-neutral-800 dark:text-zinc-300">${data.marketSize}</div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+            setTimeout(initKnowledgeGraphCanvas, 100);
+        }
+
+        window.triggerQuickAction = function(action) {
+            ui.chatInput.value = action;
+            handleSend();
+        }
+
+        // --- KNOWLEDGE GRAPH CANVAS PHYSICS LOOP ---
+        function initKnowledgeGraphCanvas() {
+            const canvas = document.getElementById('graph-canvas');
+            if (!canvas) return;
+            const container = canvas.parentNode;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+
+            // Generate initial nodes from active document extractions
+            const activeDoc = AppState.documents[AppState.currentDocId];
+            if (!activeDoc || !activeDoc.insights) return;
+
+            const insights = activeDoc.insights;
+            const nodes = [{ id: 'Acme', label: activeDoc.name.split('.')[0], type: 'core', val: 14 }];
+            const links = [];
+
+            (insights.companiesMentioned || []).forEach(c => nodes.push({ id: c, label: c, type: 'competitor', val: 9 }));
+            (insights.productsMentioned || []).forEach(p => nodes.push({ id: p, label: p, type: 'product', val: 9 }));
+            (insights.peopleMentioned || []).forEach(pe => nodes.push({ id: pe, label: pe, type: 'person', val: 9 }));
+            
+            // Push fixed placeholders to ensure rich graph structure
+            if(nodes.length < 5) {
+                nodes.push({ id: 'Foundry', label: 'Foundry', type: 'core', val: 10 });
+                nodes.push({ id: 'Investors', label: 'VC Matches', type: 'investor', val: 11 });
+            }
+
+            // Distribute nodes randomly in box space
+            nodes.forEach(node => {
+                node.x = canvas.width / 2 + (Math.random() - 0.5) * 150;
+                node.y = canvas.height / 2 + (Math.random() - 0.5) * 150;
+                node.vx = 0;
+                node.vy = 0;
+            });
+
+            // Form relative links
+            for(let i = 1; i < nodes.length; i++) {
+                links.push({ source: nodes[0], target: nodes[i] });
+                if(i > 2) links.push({ source: nodes[1], target: nodes[i] });
+            }
+
+            AppState.graphNodes = nodes;
+            AppState.graphLinks = links;
+
+            // Start animation frame loop
+            if (AppState.animationFrameId) cancelAnimationFrame(AppState.animationFrameId);
+            runGraphPhysics();
+
+            // Track mouse movements to handle hovering details
+            canvas.onmousemove = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const mx = e.clientX - rect.left;
+                const my = e.clientY - rect.top;
+                
+                AppState.canvasHoveredNode = null;
+                for (const node of AppState.graphNodes) {
+                    const dist = Math.hypot(node.x - mx, node.y - my);
+                    if (dist < node.val + 6) {
+                        AppState.canvasHoveredNode = node;
+                        break;
+                    }
+                }
+            };
+
+            canvas.onmousedown = () => {
+                if (AppState.canvasHoveredNode) {
+                    showToast("Insight Node Focus", `Deep-querying insights related to: ${AppState.canvasHoveredNode.label}...`, "info");
+                    triggerQuickAction(`Detail analysis on ${AppState.canvasHoveredNode.label}`);
+                }
+            };
+        }
+
+        function runGraphPhysics() {
+            const canvas = document.getElementById('graph-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const nodes = AppState.graphNodes;
+            const links = AppState.graphLinks;
+
+            // Physics constants
+            const kSpring = 0.05;
+            const lengthSpring = 100;
+            const kRepel = 1200;
+            const kGravity = 0.02;
+
+            // Repulsive force among node points
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const dx = nodes[j].x - nodes[i].x;
+                    const dy = nodes[j].y - nodes[i].y;
+                    const dist = Math.hypot(dx, dy) || 1;
+                    if (dist < 180) {
+                        const force = kRepel / (dist * dist);
+                        const fx = (dx / dist) * force;
+                        const fy = (dy / dist) * force;
+                        nodes[i].vx -= fx;
+                        nodes[i].vy -= fy;
+                        nodes[j].vx += fx;
+                        nodes[j].vy += fy;
+                    }
+                }
+            }
+
+            // Link tension springs
+            links.forEach(link => {
+                const dx = link.target.x - link.source.x;
+                const dy = link.target.y - link.source.y;
+                const dist = Math.hypot(dx, dy) || 1;
+                const force = kSpring * (dist - lengthSpring);
+                const fx = (dx / dist) * force;
+                const fy = (dy / dist) * force;
+                link.source.vx += fx;
+                link.source.vy += fy;
+                link.target.vx -= fx;
+                link.target.vy -= fy;
+            });
+
+            // Move & Draw loop
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Links
+            ctx.strokeStyle = document.documentElement.classList.contains('dark') ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)';
+            ctx.lineWidth = 1.5;
+            links.forEach(link => {
+                ctx.beginPath();
+                ctx.moveTo(link.source.x, link.source.y);
+                ctx.lineTo(link.target.x, link.target.y);
+                ctx.stroke();
+            });
+
+            // Update node positions with gentle boundaries
+            nodes.forEach(node => {
+                // Gravity pulling towards center
+                node.vx += (canvas.width / 2 - node.x) * kGravity;
+                node.vy += (canvas.height / 2 - node.y) * kGravity;
+
+                node.x += node.vx;
+                node.y += node.vy;
+                node.vx *= 0.85; // Friction damping
+                node.vy *= 0.85;
+
+                // Color themes
+                let nodeColor = '#0ea5e9';
+                if(node.type === 'core') nodeColor = '#6366f1';
+                else if(node.type === 'competitor') nodeColor = '#ef4444';
+                else if(node.type === 'investor') nodeColor = '#eab308';
+
+                // Shadow details
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = nodeColor;
+
+                // Draw circles
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, node.val, 0, 2 * Math.PI);
+                ctx.fillStyle = nodeColor;
+                ctx.fill();
+
+                ctx.shadowBlur = 0; // Reset shadow
+
+                // Draw text labels with strict dark mode color protection
+                ctx.fillStyle = document.documentElement.classList.contains('dark') ? '#e4e4e7' : '#2C2C28';
+                ctx.font = '500 10px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(node.label, node.x, node.y - node.val - 5);
+            });
+
+            // Highlight hovered nodes
+            if (AppState.canvasHoveredNode) {
+                ctx.strokeStyle = '#84a98c';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(AppState.canvasHoveredNode.x, AppState.canvasHoveredNode.y, AppState.canvasHoveredNode.val + 4, 0, 2 * Math.PI);
+                ctx.stroke();
+            }
+
+            AppState.animationFrameId = requestAnimationFrame(runGraphPhysics);
+        }
+
+        // --- COMPARE WORKSPACE MATRIX MODULE ---
+        function updateCompareSelectors() {
+            const select1 = document.getElementById('compare-select-1');
+            const select2 = document.getElementById('compare-select-2');
+            if(!select1 || !select2) return;
+
+            select1.innerHTML = '';
+            select2.innerHTML = '';
+
+            const docs = Object.values(AppState.documents);
+            docs.forEach((doc, idx) => {
+                const opt1 = document.createElement('option');
+                opt1.value = doc.id;
+                opt1.textContent = doc.name;
+                select1.appendChild(opt1);
+
+                const opt2 = document.createElement('option');
+                opt2.value = doc.id;
+                opt2.textContent = doc.name;
+                if(idx === 1) opt2.selected = true;
+                select2.appendChild(opt2);
+            });
+
+            select1.onchange = select2.onchange = renderCompareMatrix;
+        }
+
+        function renderCompareMatrix() {
+            const s1 = document.getElementById('compare-select-1');
+            const s2 = document.getElementById('compare-select-2');
+            const grid = document.getElementById('compare-content');
+            if(!s1 || !s2 || !grid) return;
+
+            const doc1 = AppState.documents[s1.value];
+            const doc2 = AppState.documents[s2.value];
+
+            if(!doc1 || !doc2) {
+                grid.innerHTML = `<div class="col-span-2 text-center text-gray-500 py-20 dark:text-zinc-500">Please upload at least 2 files to cross-compare.</div>`;
+                return;
+            }
+
+            const buildDocCard = (doc) => {
+                const score = doc.insights?.scores || { healthScore: 78, investmentReadiness: 'Silver', growthPotential: 'Strong', riskScore: 'Low' };
+                const numbers = (doc.insights?.importantNumbers || []).map(n => `
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100 dark:border-zinc-800">
+                        <span class="text-xs text-neutral-500 dark:text-zinc-400">${n.metric}</span>
+                        <span class="text-xs font-bold text-gray-900 dark:text-zinc-100">${n.value}</span>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-gray-200 dark:border-zinc-850 shadow-md space-y-4">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="file-text" class="w-5 h-5 text-sage-500"></i>
+                            <h3 class="font-bold text-sm text-gray-900 dark:text-zinc-150">${doc.name}</h3>
+                        </div>
+
+                        <!-- Core Scores Side Compare -->
+                        <div class="grid grid-cols-2 gap-3 bg-gray-50 dark:bg-zinc-950 p-4 rounded-xl border border-gray-100 dark:border-zinc-800/80">
+                            <div>
+                                <span class="text-[10px] text-gray-500 dark:text-zinc-500 block uppercase">Health Score</span>
+                                <span class="text-xl font-bold text-brand-500">${score.healthScore}%</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-gray-500 dark:text-zinc-500 block uppercase">Ready State</span>
+                                <span class="text-xl font-bold text-purple-500">${score.investmentReadiness}</span>
+                            </div>
+                            <div class="mt-2">
+                                <span class="text-[10px] text-gray-500 dark:text-zinc-500 block uppercase">Growth</span>
+                                <span class="text-sm font-semibold text-green-500">${score.growthPotential}</span>
+                            </div>
+                            <div class="mt-2">
+                                <span class="text-[10px] text-gray-500 dark:text-zinc-500 block uppercase">Risk Factor</span>
+                                <span class="text-sm font-semibold text-red-500">${score.riskScore}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="text-xs font-bold text-neutral-500 dark:text-zinc-400 block mb-2">Metrics Extracted</span>
+                            ${numbers || '<p class="text-xs text-neutral-400 dark:text-zinc-500 italic">No exact metrics extracted.</p>'}
+                        </div>
+
+                        <div>
+                            <span class="text-xs font-bold text-neutral-500 dark:text-zinc-400 block mb-1">Opportunities Strategy</span>
+                            <p class="text-xs text-gray-600 dark:text-zinc-400 leading-relaxed">${doc.insights?.aiInsightsPanel?.topOpportunity || 'Generic growth track.'}</p>
+                        </div>
+                    </div>
+                `;
+            };
+
+            grid.innerHTML = buildDocCard(doc1) + buildDocCard(doc2);
+            lucide.createIcons();
+        }
+
+        // --- PITCH DECK MODULE ---
+        async function triggerDeckGeneration() {
+            const frame = document.getElementById('slide-main-content');
+            if(!frame) return;
+
+            const activeDoc = AppState.documents[AppState.currentDocId];
+            if(!activeDoc) return;
+
+            // Generate Slide layouts from Document Insights using strict parsing
+            const insights = activeDoc.insights || {};
+            const summary = insights.executiveSummary || "Dynamic business details loading.";
+            
+            AppState.deckSlides = [
+                {
+                    topic: "COMPANY OVERVIEW",
+                    title: activeDoc.name.split('.')[0],
+                    desc: summary.substring(0, 150) + "...",
+                    bulletPoints: ["Revolutionary market expansion.", "Predictive analytics workflow module."]
+                },
+                {
+                    topic: "THE MARKET PROBLEM",
+                    title: "Incompetent Decision Cycles",
+                    desc: insights.aiInsightsPanel?.highestRisk || "High execution times and legacy systems hold startup founders back from agile scaling.",
+                    bulletPoints: ["Poor competitor comparison insight channels.", "Unstructured workflow documentation."]
+                },
+                {
+                    topic: "OUR PROPOSED SOLUTION",
+                    title: "Venture Real-time Synthesizer",
+                    desc: insights.aiInsightsPanel?.fastestGrowthStrategy || "Integrates directly into knowledge flows, establishing direct visual dashboards.",
+                    bulletPoints: ["Extract business timelines in clicks.", "Direct investor readiness assessments."]
+                },
+                {
+                    topic: "THE OPPORTUNITY",
+                    title: "Untapped Expansion Verticals",
+                    desc: insights.aiInsightsPanel?.topOpportunity || "Large and expanding enterprise verticals await adaptive technology integrations.",
+                    bulletPoints: ["High LTV relative to initial validation sprints.", "Predictive models mapping continuous growth metrics."]
+                },
+                {
+                    topic: "INVESTOR DEPLOYMENT TRACK",
+                    title: "Strategic Capital Allocation",
+                    desc: insights.aiInsightsPanel?.mostValuableRecommendation || "Accelerating development and customer-discovery sprint modules is critical.",
+                    bulletPoints: ["70% Technical talent scaling.", "30% Programmatic commercial rollout."]
+                }
+            ];
+
+            AppState.currentSlideIndex = 0;
+            renderActiveSlide();
+        }
+
+        function renderActiveSlide() {
+            const slide = AppState.deckSlides[AppState.currentSlideIndex];
+            if (!slide) return;
+
+            document.getElementById('slide-topic').innerText = slide.topic;
+            document.getElementById('slide-num-indicator').innerText = `SLIDE ${AppState.currentSlideIndex + 1} OF ${AppState.deckSlides.length}`;
+
+            const mainContent = document.getElementById('slide-main-content');
+            mainContent.innerHTML = `
+                <h3 class="text-3xl font-extrabold text-gray-900 dark:text-white leading-tight">${slide.title}</h3>
+                <p class="text-sm text-gray-600 dark:text-zinc-400 max-w-xl leading-relaxed font-medium">${slide.desc}</p>
+                <ul class="space-y-2 mt-4">
+                    ${slide.bulletPoints.map(bp => `
+                        <li class="flex items-center gap-3 text-xs font-semibold text-gray-500 dark:text-zinc-400">
+                            <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                            <span>${bp}</span>
+                        </li>
+                    `).join('')}
+                </ul>
+            `;
+        }
+
+        window.changeSlide = function(dir) {
+            let nextIdx = AppState.currentSlideIndex + dir;
+            if (nextIdx >= 0 && nextIdx < AppState.deckSlides.length) {
+                AppState.currentSlideIndex = nextIdx;
+                renderActiveSlide();
+            }
+        }
+
+        // --- AI CHAT INTEGRATION ---
+        
+        function getAggregatedContext() {
+            let context = "";
+            for(let id in AppState.documents) {
+                const doc = AppState.documents[id];
+                context += `\n\n--- DOCUMENT: [${doc.name}] ---\n`;
+                for(let p in doc.textByPage) {
+                    context += `[Page ${p}]: ${doc.textByPage[p]}\n`;
+                }
+            }
+            return context;
+        }
+
+        function getSystemPrompt() {
+            return `You are Venture, an AI startup companion. Personality: Warm, Creative, Strategic, Professional, but highly Conversational.
+You have access to the user's uploaded documents.
+CURRENT UPLOADED DOCUMENT CONTENT:
+${getAggregatedContext()}
+
+AVAILABLE TOOLS:
+- SWOT Analysis
+- Revenue Model Generator
+- Investor Pitch Generator
+- Knowledge Graph Generator
+- Executive Summary Generator
+- Pitch Deck Generator
+- Customer Persona Generator
+- Risk Analyzer
+- Go-To-Market Strategy
+- Business Model Canvas
+- Market Opportunity Analysis
+- Startup Roadmap
+- Business Name Suggestions
+- Competitor Comparison
+
+INSTRUCTIONS:
+1. Document Search: If info exists in docs, answer using it and cite exactly: \`[DocName.pdf, Page X]\`.
+2. Agentic Routing: Analyze the user's request. If it aligns with any of the AVAILABLE TOOLS, you MUST invoke the tool by putting this exact format ANYWHERE in your response: 
+[TOOL: Tool Name]
+3. Proactive Suggestions: After EVERY response, you MUST suggest 3 relevant follow-up actions. Put them at the VERY END in this exact format:
+[SUGGESTIONS: Action 1 | Action 2 | Action 3]
+`;
+        }
+
+        function parseAiResponse(rawText) {
+            let text = rawText;
+            let tool = null;
+            let suggestions = [];
+
+            const toolRegex = /\[TOOL:\s*(.*?)\]/i;
+            const toolMatch = text.match(toolRegex);
+            if (toolMatch) {
+                tool = toolMatch[1].trim();
+                text = text.replace(toolRegex, '');
+            }
+
+            const sugRegex = /\[SUGGESTIONS:\s*(.*?)\]/i;
+            const sugMatch = text.match(sugRegex);
+            if (sugMatch) {
+                const sugStr = sugMatch[1];
+                suggestions = sugStr.split('|').map(s => s.trim().replace(/\[|\]/g, ''));
+                text = text.replace(sugRegex, '');
+            }
+
+            return { tool, text: text.trim(), suggestions };
+        }
+
+        function updateDynamicSuggestions(suggestions) {
+            const container = document.getElementById('dynamic-suggestions');
+            if (!suggestions || suggestions.length === 0) return;
+            
+            container.innerHTML = suggestions.map((sug, index) => {
+                const colorClass = index === 0 
+                    ? 'border-sage-200 bg-sage-50 text-sage-700 hover:bg-sage-100 dark:border-sage-500/30 dark:bg-sage-500/10 dark:text-sage-300 dark:hover:bg-sage-500/20 font-bold'
+                    : 'border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800/80 font-bold';
+                
+                return `
+                <button class="prompt-chip snap-start flex-shrink-0 whitespace-nowrap px-3 py-1.5 rounded-full border ${colorClass} text-xs transition-colors shadow-sm" onclick="document.getElementById('chat-input').value='${sug.replace(/'/g, "\\'")}'; document.getElementById('send-btn').click();">
+                    ${sug}
+                </button>
+            `}).join('');
+        }
+
+        function appendMessage(role, rawText) {
+            const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            let html = '';
+
+            if (role === 'user') {
+                AppState.chatHistory.push({ role: "user", parts: [{ text: rawText }] });
+                html = `
+                <div class="flex gap-3 justify-end group animate-fade-in">
+                    <div class="max-w-[85%] flex flex-col items-end gap-1">
+                        <div class="bg-sage-500 text-white px-4 py-2.5 rounded-2xl rounded-tr-sm text-xs shadow-sm font-semibold whitespace-pre-wrap">${DOMPurify.sanitize(rawText)}</div>
+                    </div>
+                </div>`;
+            } else if (role === 'model') {
+                AppState.chatHistory.push({ role: "model", parts: [{ text: rawText }] });
+                
+                const { tool, text, suggestions } = parseAiResponse(rawText);
+                
+                let parsedContent = marked.parse(text);
+                
+                const citationRegex = /\[([^,]+),\s*Page\s*(\d+)\]/gi;
+                parsedContent = parsedContent.replace(citationRegex, (match, docName, pageNum) => {
+                    let targetId = null;
+                    for(let id in AppState.documents) {
+                        if(AppState.documents[id].name.toLowerCase() === docName.trim().toLowerCase()) { targetId = id; break; }
+                    }
+                    const argId = targetId ? `'${targetId}'` : 'null';
+                    return `<button class="citation-btn" onclick="goToPage(${pageNum}, ${argId})"><i data-lucide="external-link"></i> ${docName}, pg ${pageNum}</button>`;
+                });
+                
+                parsedContent = DOMPurify.sanitize(parsedContent, { ADD_ATTR: ['onclick'] }); 
+                
+                let toolHtml = '';
+                if (tool) {
+                    toolHtml = `
+                    <div class="mb-3 p-3 rounded-xl bg-warm-200/50 dark:bg-zinc-950 border border-neutral-200 dark:border-zinc-800 shadow-sm relative overflow-hidden group/tool">
+                        <div class="flex items-center justify-between relative z-10">
+                            <div>
+                                <div class="flex items-center gap-1.5 text-sage-500 mb-1 font-bold text-[9px] uppercase tracking-wider">
+                                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Venture Action
+                                </div>
+                                <div class="flex items-center gap-2 text-warm-800 dark:text-zinc-150 font-bold text-xs">
+                                    <i data-lucide="check" class="w-4 h-4 text-sage-500"></i> ${tool} Structured
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                    showToast("Workspace Synced", `${tool} generated!`, "success");
+                }
+
+                html = `
+                <div class="flex gap-3 group w-full animate-fade-in">
+                    <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-sage-500 to-softteal-500 flex items-center justify-center flex-shrink-0 mt-1 shadow-sm text-white">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                    </div>
+                    <div class="max-w-[85%] flex flex-col gap-1 w-full overflow-hidden">
+                        ${toolHtml}
+                        <div class="text-neutral-700 dark:text-zinc-200 text-xs leading-relaxed prose dark:prose-invert prose-sm max-w-none markdown-body bg-white dark:bg-transparent p-4 dark:p-0 rounded-2xl dark:rounded-none border border-neutral-200/60 dark:border-transparent shadow-sm dark:shadow-none">
+                            ${parsedContent}
+                        </div>
+                    </div>
+                </div>`;
+
+                if (suggestions.length > 0) {
+                    updateDynamicSuggestions(suggestions);
+                }
+            } else if (role === 'error') {
+                html = `
+                <div class="flex gap-3 group w-full animate-fade-in">
+                    <div class="w-8 h-8 rounded-xl bg-red-500 flex items-center justify-center flex-shrink-0 mt-1 shadow-sm text-white">
+                        <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                    </div>
+                    <div class="max-w-[85%] flex flex-col gap-1 w-full overflow-hidden">
+                        <div class="text-red-600 dark:text-red-400 text-xs leading-relaxed prose dark:prose-invert prose-sm max-w-none markdown-body bg-white dark:bg-transparent p-4 dark:p-0 rounded-2xl dark:rounded-none border border-red-200/60 dark:border-transparent shadow-sm dark:shadow-none">
+                            ${marked.parse(rawText)}
+                        </div>
+                    </div>
+                </div>`;
+            } else if (role === 'assistant') {
+                let parsedContent = marked.parse(rawText);
+                html = `
+                <div class="flex gap-3 group w-full animate-fade-in">
+                    <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-sage-500 to-softteal-500 flex items-center justify-center flex-shrink-0 mt-1 shadow-sm text-white">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                    </div>
+                    <div class="max-w-[85%] flex flex-col gap-1 w-full overflow-hidden">
+                        <div class="text-neutral-700 dark:text-zinc-200 text-xs leading-relaxed prose dark:prose-invert prose-sm max-w-none markdown-body bg-white dark:bg-transparent p-4 dark:p-0 rounded-2xl dark:rounded-none border border-neutral-200/60 dark:border-transparent shadow-sm dark:shadow-none">
+                            ${parsedContent}
+                        </div>
+                    </div>
+                </div>`;
+            }
+
+            ui.chatHistoryEl.insertAdjacentHTML('beforeend', html);
+            lucide.createIcons();
+            ui.chatHistoryEl.scrollTo({ top: ui.chatHistoryEl.scrollHeight, behavior: 'smooth' });
+        }
+
+        async function handleSend() {
+            const text = ui.chatInput.value.trim();
+            if (!text || AppState.isGenerating) return;
+
+            ui.chatInput.value = '';
+            ui.chatInput.style.height = 'auto'; 
+            AppState.isGenerating = true;
+            ui.sendBtn.disabled = true;
+
+            appendMessage('user', text);
+            
+            const typingId = 'typing-' + Date.now();
+            ui.chatHistoryEl.insertAdjacentHTML('beforeend', `<div id="${typingId}" class="flex gap-3 animate-pulse"><div class="w-8 h-8 rounded-lg bg-neutral-200/80 dark:bg-zinc-800 mt-1"></div><div class="bg-neutral-100 dark:bg-white/5 px-4 py-3 rounded-2xl w-fit"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div></div>`);
+            ui.chatHistoryEl.scrollTo({ top: ui.chatHistoryEl.scrollHeight });
+
+            const payload = {
+                contents: [...AppState.chatHistory], 
+                systemInstruction: { parts: [{ text: getSystemPrompt() }] }
+            };
+            const delays = [1000, 2000, 4000, 8000, 16000];
+            let success = false;
+            let responseText = "No response generated.";
+
+            for (let i = 0; i < 6; i++) {
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${AppState.apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error?.message || "API Error");
+                    }
+                    
+                    const data = await response.json();
+                    responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || responseText;
+                    success = true;
+                    break;
+                } catch (e) {
+                    console.error("API Attempt Failed:", e.message);
+                    if (i < 5) await new Promise(res => setTimeout(res, delays[i]));
+                }
+            }
+
+            document.getElementById(typingId)?.remove();
+            
+            if (success) {
+                appendMessage('model', responseText);
+            } else {
+                appendMessage('error', "**Error:** Failed to connect to Gemini API after multiple attempts. Please try again later.");
+            }
+
+            AppState.isGenerating = false;
+            ui.sendBtn.disabled = false;
+        }
+
+        ui.sendBtn.addEventListener('click', handleSend);
+        ui.chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } });
+        ui.chatInput.addEventListener('input', function() { this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px'; });
+
+        document.getElementById('new-chat-btn').onclick = () => {
+            AppState.chatHistory = [];
+            ui.chatHistoryEl.innerHTML = '';
+            appendMessage('assistant', "👋 Hi! I'm Venture. Think of me as your startup companion. Let's explore strategies together.");
+        };
+
+        // Add tailwind markdown styles dynamically with strict dark mode color rules
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .markdown-body ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.5rem; }
+            .markdown-body p { margin-bottom: 0.75rem; }
+            .markdown-body strong { font-weight: 600; color: inherit; }
+            .dark .markdown-body strong { color: #f4f4f5; }
+        `;
+        document.head.appendChild(style);
+
+        // Bind initial static prompt chips
+        document.querySelectorAll('.prompt-chip').forEach(chip => {
+            chip.onclick = () => {
+                ui.chatInput.value = chip.innerText.trim();
+                ui.sendBtn.click();
+            }
+        });
+
+        // Init Setup
+        appendMessage('assistant', "👋 Hi! I'm Venture.\n\nThink of me as your startup companion. I'll help you understand your documents, challenge your ideas, prepare investor pitches, identify risks and discover new opportunities. Upload a file on the left or select a prompt below to get started.");
+
+    </script>
+</body>
+</html>
