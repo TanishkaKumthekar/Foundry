@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1021,17 +1022,49 @@
                 const li = document.createElement('li');
                 const isActive = doc.id === AppState.currentDocId;
                 li.className = `doc-item group flex items-center justify-between p-2.5 rounded-xl cursor-pointer transition-all border border-transparent ${isActive ? 'active shadow-sm font-semibold' : 'hover:bg-warm-200/50 dark:hover:bg-zinc-800'}`;
-                li.onclick = () => selectDocument(doc.id);
+                li.onclick = (e) => { if (!e.target.closest('.doc-remove-btn')) selectDocument(doc.id); };
                 li.innerHTML = `
-                    <div class="flex items-center gap-3 overflow-hidden text-warm-800 dark:text-zinc-200">
+                    <div class="flex items-center gap-3 overflow-hidden text-warm-800 dark:text-zinc-200 flex-1 min-w-0">
                         <i data-lucide="file-text" class="w-4 h-4 flex-shrink-0 text-sage-500"></i>
                         <span class="text-xs truncate">${doc.name}</span>
                     </div>
+                    <button class="doc-remove-btn flex-shrink-0 ml-1 p-1 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors opacity-0 group-hover:opacity-100" title="Remove document" onclick="removeDocument('${doc.id}')">
+                        <i data-lucide="x" class="w-3 h-3"></i>
+                    </button>
                 `;
                 ui.docList.appendChild(li);
             });
             lucide.createIcons();
         }
+
+        window.removeDocument = function(docId) {
+            delete AppState.documents[docId];
+
+            // If removed doc was active, switch to another or reset workspace
+            if (AppState.currentDocId === docId) {
+                AppState.currentDocId = null;
+                const remaining = Object.keys(AppState.documents);
+                if (remaining.length > 0) {
+                    selectDocument(remaining[0]);
+                } else {
+                    // No documents left — reset to empty workspace
+                    if (AppState.animationFrameId) {
+                        cancelAnimationFrame(AppState.animationFrameId);
+                        AppState.animationFrameId = null;
+                    }
+                    AppState.graphNodes = [];
+                    AppState.graphLinks = [];
+                    AppState.deckSlides = [];
+                    AppState.currentSlideIndex = 0;
+                    ui.emptyState.classList.remove('hidden');
+                    ui.activeState.classList.add('hidden');
+                }
+            }
+
+            renderSidebarList();
+            updateCompareSelectors();
+            showToast("Document Removed", "The document has been removed from your workspace.", "info");
+        };
 
         async function loadAndProcessPDF(docId) {
             const doc = AppState.documents[docId];
@@ -1381,63 +1414,71 @@ ${fullText.substring(0, 50000)}
                 <!-- REDESIGNED HOME STATE: TODAY'S STARTUP SNAPSHOT (With improved dark mode text contrast) -->
                 <div>
                     <h2 class="text-xs font-bold text-neutral-400 dark:text-zinc-500 uppercase tracking-wider mb-4">Today's Startup Snapshot</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                         
                         <!-- Biggest Opportunity Card -->
-                        <div class="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-neutral-200/60 dark:border-zinc-800 shadow-sm space-y-2 flex flex-col justify-between">
-                            <div class="flex items-center gap-2">
-                                <div class="w-7 h-7 rounded-lg bg-sage-50 dark:bg-zinc-800/80 flex items-center justify-center text-sage-500">
+                        <div class="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-neutral-200/60 dark:border-zinc-800 shadow-sm flex flex-col min-w-0" style="height:250px">
+                            <div class="flex items-center gap-2 mb-3 flex-shrink-0">
+                                <div class="w-7 h-7 rounded-lg bg-sage-50 dark:bg-zinc-800/80 flex items-center justify-center text-sage-500 flex-shrink-0">
                                     <i data-lucide="lightbulb" class="w-4 h-4"></i>
                                 </div>
-                                <span class="text-[10px] font-bold text-neutral-400 dark:text-zinc-500 uppercase tracking-wider">Top Opportunity</span>
+                                <span class="text-[10px] font-bold text-neutral-400 dark:text-zinc-500 uppercase tracking-wider leading-tight">Top Opportunity</span>
                             </div>
-                            <p class="text-xs text-neutral-600 dark:text-zinc-200 leading-relaxed font-semibold">${insightsPanel.topOpportunity}</p>
+                            <div class="flex-1 overflow-y-auto pr-1" style="scrollbar-width:thin;scrollbar-color:#e4e4e0 transparent">
+                                <p class="text-xs text-neutral-600 dark:text-zinc-200 leading-relaxed font-semibold">${insightsPanel.topOpportunity}</p>
+                            </div>
                         </div>
 
                         <!-- Highest Risk Card -->
-                        <div class="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-neutral-200/60 dark:border-zinc-800 shadow-sm space-y-2 flex flex-col justify-between">
-                            <div class="flex items-center gap-2">
-                                <div class="w-7 h-7 rounded-lg bg-coral-500/10 flex items-center justify-center text-coral-500">
+                        <div class="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-neutral-200/60 dark:border-zinc-800 shadow-sm flex flex-col min-w-0" style="height:250px">
+                            <div class="flex items-center gap-2 mb-3 flex-shrink-0">
+                                <div class="w-7 h-7 rounded-lg bg-coral-500/10 flex items-center justify-center text-coral-500 flex-shrink-0">
                                     <i data-lucide="alert-triangle" class="w-4 h-4"></i>
                                 </div>
-                                <span class="text-[10px] font-bold text-neutral-400 dark:text-zinc-500 uppercase tracking-wider">Biggest Risk</span>
+                                <span class="text-[10px] font-bold text-neutral-400 dark:text-zinc-500 uppercase tracking-wider leading-tight">Biggest Risk</span>
                             </div>
-                            <p class="text-xs text-neutral-600 dark:text-zinc-200 leading-relaxed font-semibold">${insightsPanel.highestRisk}</p>
+                            <div class="flex-1 overflow-y-auto pr-1" style="scrollbar-width:thin;scrollbar-color:#e4e4e0 transparent">
+                                <p class="text-xs text-neutral-600 dark:text-zinc-200 leading-relaxed font-semibold">${insightsPanel.highestRisk}</p>
+                            </div>
                         </div>
 
                         <!-- Growth Strategy Card -->
-                        <div class="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-neutral-200/60 dark:border-zinc-800 shadow-sm space-y-2 flex flex-col justify-between">
-                            <div class="flex items-center gap-2">
-                                <div class="w-7 h-7 rounded-lg bg-warmorange-500/10 flex items-center justify-center text-warmorange-500 animate-bounce-slight">
+                        <div class="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-neutral-200/60 dark:border-zinc-800 shadow-sm flex flex-col min-w-0" style="height:250px">
+                            <div class="flex items-center gap-2 mb-3 flex-shrink-0">
+                                <div class="w-7 h-7 rounded-lg bg-warmorange-500/10 flex items-center justify-center text-warmorange-500 animate-bounce-slight flex-shrink-0">
                                     <i data-lucide="rocket" class="w-4 h-4"></i>
                                 </div>
-                                <span class="text-[10px] font-bold text-neutral-400 dark:text-zinc-500 uppercase tracking-wider">Suggested Step</span>
+                                <span class="text-[10px] font-bold text-neutral-400 dark:text-zinc-500 uppercase tracking-wider leading-tight">Suggested Step</span>
                             </div>
-                            <p class="text-xs text-neutral-600 dark:text-zinc-200 leading-relaxed font-semibold">${insightsPanel.fastestGrowthStrategy}</p>
+                            <div class="flex-1 overflow-y-auto pr-1" style="scrollbar-width:thin;scrollbar-color:#e4e4e0 transparent">
+                                <p class="text-xs text-neutral-600 dark:text-zinc-200 leading-relaxed font-semibold">${insightsPanel.fastestGrowthStrategy}</p>
+                            </div>
                         </div>
 
                         <!-- Competitor Target Card -->
-                        <div class="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-neutral-200/60 dark:border-zinc-800 shadow-sm space-y-2 flex flex-col justify-between">
-                            <div class="flex items-center gap-2">
-                                <div class="w-7 h-7 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-500">
+                        <div class="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-neutral-200/60 dark:border-zinc-800 shadow-sm flex flex-col min-w-0" style="height:250px">
+                            <div class="flex items-center gap-2 mb-3 flex-shrink-0">
+                                <div class="w-7 h-7 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-500 flex-shrink-0">
                                     <i data-lucide="shield" class="w-4 h-4"></i>
                                 </div>
-                                <span class="text-[10px] font-bold text-neutral-400 dark:text-zinc-500 uppercase tracking-wider">Key Peer Target</span>
+                                <span class="text-[10px] font-bold text-neutral-400 dark:text-zinc-500 uppercase tracking-wider leading-tight">Key Peer Target</span>
                             </div>
-                            <p class="text-xs text-neutral-600 dark:text-zinc-200 leading-relaxed font-semibold">${insightsPanel.mostImportantCompetitor}</p>
+                            <div class="flex-1 overflow-y-auto pr-1" style="scrollbar-width:thin;scrollbar-color:#e4e4e0 transparent">
+                                <p class="text-xs text-neutral-600 dark:text-zinc-200 leading-relaxed font-semibold">${insightsPanel.mostImportantCompetitor}</p>
+                            </div>
                         </div>
 
                         <!-- Funding Readiness Card -->
-                        <div class="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-neutral-200/60 dark:border-zinc-800 shadow-sm space-y-2 flex flex-col justify-between">
-                            <div class="flex items-center gap-2">
-                                <div class="w-7 h-7 rounded-lg bg-yellow-500/10 flex items-center justify-center text-yellow-500">
+                        <div class="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-neutral-200/60 dark:border-zinc-800 shadow-sm flex flex-col min-w-0" style="height:250px">
+                            <div class="flex items-center gap-2 mb-3 flex-shrink-0">
+                                <div class="w-7 h-7 rounded-lg bg-yellow-500/10 flex items-center justify-center text-yellow-500 flex-shrink-0">
                                     <i data-lucide="gem" class="w-4 h-4"></i>
                                 </div>
-                                <span class="text-[10px] font-bold text-neutral-400 dark:text-zinc-500 uppercase tracking-wider">Funding State</span>
+                                <span class="text-[10px] font-bold text-neutral-400 dark:text-zinc-500 uppercase tracking-wider leading-tight">Funding State</span>
                             </div>
-                            <div class="space-y-1">
-                                <span class="text-sm font-extrabold text-neutral-800 dark:text-zinc-100">${scores.investmentReadiness} Tier</span>
-                                <div class="flex gap-1">
+                            <div class="flex-1 overflow-y-auto pr-1" style="scrollbar-width:thin;scrollbar-color:#e4e4e0 transparent">
+                                <span class="text-sm font-extrabold text-neutral-800 dark:text-zinc-100 block mb-2">${scores.investmentReadiness} Tier</span>
+                                <div class="flex flex-wrap gap-1">
                                     ${(insightsPanel.potentialInvestors || []).slice(0,1).map(inv => `<span class="px-1.5 py-0.5 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 text-[10px] rounded font-bold">${inv}</span>`).join('')}
                                 </div>
                             </div>
@@ -1497,7 +1538,7 @@ ${fullText.substring(0, 50000)}
                             <h2 class="text-sm font-bold flex items-center gap-2 text-gray-900 dark:text-zinc-100"><i data-lucide="git-branch" class="text-sage-500"></i> Workspace Relationship Graph</h2>
                             <p class="text-xs text-neutral-400 dark:text-zinc-400 mt-1">Inter-document connection entities generated dynamically.</p>
                         </div>
-                        <div class="w-full h-[280px] bg-warm-200/40 dark:bg-zinc-950 border border-neutral-100 dark:border-zinc-800 rounded-xl relative overflow-hidden flex items-center justify-center">
+                        <div class="w-full h-[420px] bg-warm-200/40 dark:bg-zinc-950 border border-neutral-100 dark:border-zinc-800 rounded-xl relative overflow-hidden flex items-center justify-center">
                             <canvas id="graph-canvas" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
                         </div>
                     </div>
@@ -1600,10 +1641,18 @@ ${fullText.substring(0, 50000)}
                 nodes.push({ id: 'Investors', label: 'VC Matches', type: 'investor', val: 11 });
             }
 
-            // Distribute nodes randomly in box space
-            nodes.forEach(node => {
-                node.x = canvas.width / 2 + (Math.random() - 0.5) * 150;
-                node.y = canvas.height / 2 + (Math.random() - 0.5) * 150;
+            // Distribute nodes in a circle to avoid initial overlap
+            const angleStep = (2 * Math.PI) / Math.max(nodes.length - 1, 1);
+            const spreadRadius = Math.min(canvas.width, canvas.height) * 0.30;
+            nodes.forEach((node, idx) => {
+                if (idx === 0) {
+                    node.x = canvas.width / 2;
+                    node.y = canvas.height / 2;
+                } else {
+                    const angle = angleStep * (idx - 1);
+                    node.x = canvas.width / 2 + Math.cos(angle) * spreadRadius;
+                    node.y = canvas.height / 2 + Math.sin(angle) * spreadRadius;
+                }
                 node.vx = 0;
                 node.vy = 0;
             });
@@ -1653,10 +1702,10 @@ ${fullText.substring(0, 50000)}
             const links = AppState.graphLinks;
 
             // Physics constants
-            const kSpring = 0.05;
-            const lengthSpring = 100;
-            const kRepel = 1200;
-            const kGravity = 0.02;
+            const kSpring = 0.04;
+            const lengthSpring = 160;
+            const kRepel = 3000;
+            const kGravity = 0.015;
 
             // Repulsive force among node points
             for (let i = 0; i < nodes.length; i++) {
@@ -1664,7 +1713,7 @@ ${fullText.substring(0, 50000)}
                     const dx = nodes[j].x - nodes[i].x;
                     const dy = nodes[j].y - nodes[i].y;
                     const dist = Math.hypot(dx, dy) || 1;
-                    if (dist < 180) {
+                    if (dist < 280) {
                         const force = kRepel / (dist * dist);
                         const fx = (dx / dist) * force;
                         const fy = (dy / dist) * force;
@@ -1703,7 +1752,8 @@ ${fullText.substring(0, 50000)}
                 ctx.stroke();
             });
 
-            // Update node positions with gentle boundaries
+            // Update node positions with boundary padding to prevent clipping
+            const padding = 30;
             nodes.forEach(node => {
                 // Gravity pulling towards center
                 node.vx += (canvas.width / 2 - node.x) * kGravity;
@@ -1713,6 +1763,10 @@ ${fullText.substring(0, 50000)}
                 node.y += node.vy;
                 node.vx *= 0.85; // Friction damping
                 node.vy *= 0.85;
+
+                // Clamp to canvas bounds with padding
+                node.x = Math.max(padding + node.val, Math.min(canvas.width - padding - node.val, node.x));
+                node.y = Math.max(padding + node.val + 14, Math.min(canvas.height - padding - node.val, node.y));
 
                 // Color themes
                 let nodeColor = '#0ea5e9';
@@ -1850,7 +1904,39 @@ ${fullText.substring(0, 50000)}
             if(!frame) return;
 
             const activeDoc = AppState.documents[AppState.currentDocId];
-            if(!activeDoc) return;
+            if(!activeDoc) {
+                // Show friendly empty state in the slide frame
+                frame.innerHTML = `
+                    <div class="flex flex-col items-center justify-center text-center py-8 gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-warm-200/60 dark:bg-zinc-800 flex items-center justify-center">
+                            <i data-lucide="presentation" class="w-6 h-6 text-neutral-400"></i>
+                        </div>
+                        <p class="text-sm font-bold text-neutral-500 dark:text-zinc-400">No Document Loaded</p>
+                        <p class="text-xs text-neutral-400 dark:text-zinc-500 max-w-xs">Upload a business plan document to generate your investor pitch deck.</p>
+                    </div>`;
+                lucide.createIcons();
+                document.getElementById('slide-topic').innerText = 'PITCH DECK';
+                document.getElementById('slide-num-indicator').innerText = 'UPLOAD A DOCUMENT';
+                return;
+            }
+
+            // Show loading state on regenerate button
+            const regenBtn = document.querySelector('[onclick="triggerDeckGeneration()"]');
+            const originalBtnHTML = regenBtn ? regenBtn.innerHTML : null;
+            if (regenBtn) {
+                regenBtn.disabled = true;
+                regenBtn.innerHTML = '<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i> Generating...';
+                lucide.createIcons();
+            }
+
+            frame.innerHTML = `
+                <div class="flex flex-col items-center justify-center text-center py-8 gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sage-500 to-softteal-500 flex items-center justify-center animate-spin">
+                        <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <p class="text-sm font-bold text-neutral-600 dark:text-zinc-300">Rebuilding your deck...</p>
+                </div>`;
+            lucide.createIcons();
 
             // Generate Slide layouts from Document Insights using strict parsing
             const insights = activeDoc.insights || {};
@@ -1891,6 +1977,13 @@ ${fullText.substring(0, 50000)}
 
             AppState.currentSlideIndex = 0;
             renderActiveSlide();
+
+            // Restore button
+            if (regenBtn && originalBtnHTML) {
+                regenBtn.disabled = false;
+                regenBtn.innerHTML = originalBtnHTML;
+                lucide.createIcons();
+            }
         }
 
         function renderActiveSlide() {
